@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap');
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'glightbox/dist/css/glightbox.min.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Noto Sans', 'Noto Sans Devanagari', ui-sans-serif, system-ui, sans-serif;
+}
+
+.np {
+    font-family: 'Noto Sans Devanagari', 'Noto Sans', sans-serif;
+}
+
+@layer components {
+    .btn-maroon {
+        @apply inline-flex items-center gap-2 rounded-md bg-maroon px-6 py-3 font-semibold text-white shadow transition hover:bg-maroon-700;
+    }
+    .btn-navy-outline {
+        @apply inline-flex items-center gap-2 rounded-md border-2 border-navy bg-white/10 px-6 py-3 font-semibold text-white transition hover:bg-white hover:text-navy;
+    }
+    .section-title-np {
+        @apply np text-2xl font-bold text-maroon md:text-3xl;
+    }
+    .section-title-en {
+        @apply font-heading text-2xl font-semibold uppercase tracking-wide text-navy;
+    }
+    .card {
+        @apply rounded-lg bg-white p-6 shadow-md;
+    }
+}
+
+/* Bridges the hero banner into the site's blue background. */
+.hero-gradient-bridge {
+    height: 60px;
+    background: linear-gradient(to bottom, rgba(0, 21, 66, 0.85), #001542 70%, theme('colors.navy.50'));
+}
