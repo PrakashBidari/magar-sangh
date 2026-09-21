@@ -2,6 +2,24 @@
 @php
     $groups = config('admin.groups');
     $resources = collect(config('admin.resources'))->map(fn ($r, $k) => $r + ['key' => $k])->groupBy('group');
+
+    // Sidebar entries per group: config resources plus the hand-built membership pages.
+    $navItems = $resources->map(fn ($items) => $items->map(fn ($r) => [
+        'label' => $r['label'],
+        'icon' => $r['icon'],
+        'href' => route('dashboard.'.$r['key'].'.index'),
+        'active' => request()->routeIs('dashboard.'.$r['key'].'.*'),
+        'badge' => null,
+    ])->values());
+
+    // Application detail / edit pages highlight the list the application belongs to.
+    $viewing = request()->routeIs('dashboard.membership.show', 'dashboard.membership.edit') ? request()->route('membership')?->status : null;
+    $pendingCount = auth()->user()->hasRole('admin') ? \App\Models\Membership::where('status', 'pending')->count() : 0;
+    $navItems['membership'] = collect($navItems['membership'] ?? [])->merge([
+        ['label' => 'Pending Applications', 'icon' => '⏳', 'href' => route('dashboard.membership.pending'), 'active' => request()->routeIs('dashboard.membership.pending') || $viewing === 'pending', 'badge' => $pendingCount ?: null],
+        ['label' => 'Approved Members', 'icon' => '✅', 'href' => route('dashboard.membership.approved'), 'active' => request()->routeIs('dashboard.membership.approved') || $viewing === 'approved', 'badge' => null],
+        ['label' => 'Disapproved', 'icon' => '⛔', 'href' => route('dashboard.membership.rejected'), 'active' => request()->routeIs('dashboard.membership.rejected') || $viewing === 'rejected', 'badge' => null],
+    ])->values();
 @endphp
 <!DOCTYPE html>
 <html lang="en" translate="no" class="notranslate">
@@ -36,6 +54,10 @@
                     <span class="dash-icon">📊</span> <span class="flex-1">Overview</span>
                 </a>
 
+                <a href="{{ route('dashboard.my-membership.show') }}" class="dash-link {{ request()->routeIs('dashboard.my-membership.*') ? 'is-active' : '' }}">
+                    <span class="dash-icon">🎫</span> <span class="flex-1">My Membership</span>
+                </a>
+
                 @role('admin')
                 <a href="{{ route('dashboard.settings') }}" class="dash-link {{ request()->routeIs('dashboard.settings') ? 'is-active' : '' }}">
                     <span class="dash-icon">⚙️</span> <span class="flex-1">Site &amp; About Settings</span>
@@ -44,16 +66,17 @@
                 <div class="dash-section-label">Manage content</div>
 
                 @foreach ($groups as $groupKey => $groupLabel)
-                    @continue(! $resources->has($groupKey))
+                    @continue(! $navItems->has($groupKey))
                     @php
-                        $items = $resources[$groupKey];
-                        $groupActive = $items->contains(fn ($r) => request()->routeIs('dashboard.'.$r['key'].'.*'));
+                        $items = $navItems[$groupKey];
+                        $groupActive = $items->contains('active', true);
+                        $groupBadge = $items->sum('badge');
                     @endphp
 
                     @if ($items->count() === 1)
                         {{-- A group with a single page is just a link --}}
                         @php $res = $items->first(); @endphp
-                        <a href="{{ route('dashboard.'.$res['key'].'.index') }}" class="dash-link {{ $groupActive ? 'is-active' : '' }}">
+                        <a href="{{ $res['href'] }}" class="dash-link {{ $groupActive ? 'is-active' : '' }}">
                             <span class="dash-icon">{{ $res['icon'] }}</span> <span class="flex-1">{{ $res['label'] }}</span>
                         </a>
                     @else
@@ -61,15 +84,22 @@
                             <button type="button" class="nav-group-toggle dash-link {{ $groupActive ? 'is-active' : '' }}" aria-expanded="{{ $groupActive ? 'true' : 'false' }}">
                                 <span class="dash-icon">{{ $items->first()['icon'] }}</span>
                                 <span class="flex-1">{{ $groupLabel }}</span>
+                                @if ($groupBadge)
+                                <span class="rounded-full bg-gold px-2 py-0.5 text-[10px] font-extrabold text-navy">{{ $groupBadge }}</span>
+                                @else
                                 <span class="dash-badge">{{ $items->count() }}</span>
+                                @endif
                                 <svg xmlns="http://www.w3.org/2000/svg" class="nav-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                             </button>
                             <div class="nav-group-panel">
                                 <div class="nav-group-inner">
                                     <div class="ml-7 mt-1 space-y-0.5 border-l border-white/15 pb-1 pl-3">
                                         @foreach ($items as $res)
-                                        <a href="{{ route('dashboard.'.$res['key'].'.index') }}" style="--i: {{ $loop->index }}" class="dash-sublink {{ request()->routeIs('dashboard.'.$res['key'].'.*') ? 'is-active' : '' }}">
-                                            <span class="w-5 text-center">{{ $res['icon'] }}</span> <span class="truncate">{{ $res['label'] }}</span>
+                                        <a href="{{ $res['href'] }}" style="--i: {{ $loop->index }}" class="dash-sublink {{ $res['active'] ? 'is-active' : '' }}">
+                                            <span class="w-5 text-center">{{ $res['icon'] }}</span> <span class="flex-1 truncate">{{ $res['label'] }}</span>
+                                            @if ($res['badge'])
+                                            <span class="rounded-full bg-gold px-1.5 text-[10px] font-extrabold text-navy">{{ $res['badge'] }}</span>
+                                            @endif
                                         </a>
                                         @endforeach
                                     </div>

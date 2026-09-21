@@ -7,6 +7,7 @@ use App\Models\ContactMessage;
 use App\Models\Donation;
 use App\Models\Event;
 use App\Models\GalleryPhoto;
+use App\Models\Membership;
 use App\Models\News;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,6 +21,8 @@ class DashboardController extends Controller
         if ($request->user()->hasRole('admin')) {
             $stats = [
                 ['label' => 'Total Users', 'value' => number_format(User::count()), 'route' => 'dashboard.users.index'],
+                ['label' => 'Pending Applications', 'value' => number_format(Membership::where('status', Membership::PENDING)->count()), 'route' => 'dashboard.membership.pending', 'accent' => true],
+                ['label' => 'Active Members', 'value' => number_format(Membership::active()->count()), 'route' => 'dashboard.membership.approved'],
                 ['label' => 'Donations', 'value' => number_format(Donation::count()), 'route' => 'dashboard.donations.index'],
                 ['label' => 'Donation Amount', 'value' => 'Rs. '.number_format(Donation::sum('amount'), 2), 'route' => 'dashboard.donations.index', 'accent' => true],
                 ['label' => 'Contact Messages', 'value' => number_format(ContactMessage::count()), 'route' => 'dashboard.messages.index'],
@@ -30,7 +33,11 @@ class DashboardController extends Controller
             ];
         }
 
-        return view('dashboard.index', ['stats' => $stats, 'user' => $request->user()]);
+        return view('dashboard.index', [
+            'stats' => $stats,
+            'user' => $request->user(),
+            'membership' => $request->user()->memberships()->with('type')->latest('id')->first(),
+        ]);
     }
 
     public function settings()

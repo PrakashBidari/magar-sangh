@@ -56,6 +56,10 @@
             </li>
 
             <li>
+                <a href="{{ route('membership.types') }}" class="{{ $navItem }} {{ $isActive('membership.*') }}">Membership</a>
+            </li>
+
+            <li>
                 <a href="{{ route('contact') }}" class="{{ $navItem }} {{ $isActive('contact') }}">Contact Us</a>
             </li>
         </ul>

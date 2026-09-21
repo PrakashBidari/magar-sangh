@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MembershipTypeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Models\Article;
 use App\Models\CommitteeMember;
@@ -9,6 +10,7 @@ use App\Models\Event;
 use App\Models\GalleryPhoto;
 use App\Models\GalleryVideo;
 use App\Models\HeroSlide;
+use App\Models\MembershipType;
 use App\Models\News;
 use App\Models\NotificationItem;
 use App\Models\Publication;
@@ -35,6 +37,7 @@ return [
         'media' => 'Media & Information',
         'gallery' => 'Gallery',
         'organization' => 'Organization',
+        'membership' => 'Membership',
         'donation' => 'Donations',
         'inbox' => 'Inbox',
         'people' => 'People',
@@ -272,6 +275,35 @@ return [
             ],
         ],
 
+        // ---------------------------------------------------------------- Membership
+        // The application lists (pending / approved / disapproved) are custom pages, see routes/web.php.
+        'membership-types' => [
+            'group' => 'membership',
+            'label' => 'Membership Types',
+            'singular' => 'Membership Type',
+            'icon' => '🏷️',
+            'model' => MembershipType::class,
+            'controller' => MembershipTypeController::class,
+            'order' => ['sort_order', 'asc'],
+            'columns' => [
+                ['field' => 'name_en', 'label' => 'Name (English)'],
+                ['field' => 'name_np', 'label' => 'Name (Nepali)', 'class' => 'np'],
+                ['field' => 'duration_label', 'label' => 'Duration'],
+                ['field' => 'fee_label', 'label' => 'Price'],
+                ['field' => 'memberships_count', 'label' => 'Applications'],
+                ['field' => 'is_active', 'label' => 'Open', 'type' => 'boolean'],
+            ],
+            'fields' => [
+                ['name' => 'name_en', 'label' => 'Name (English)', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half'],
+                ['name' => 'name_np', 'label' => 'Name (Nepali)', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half', 'class' => 'np'],
+                ['name' => 'duration_unit', 'label' => 'Validity', 'type' => 'select', 'options' => ['years' => 'Years', 'months' => 'Months', 'lifetime' => 'Lifetime (never expires)'], 'rules' => 'required|in:years,months,lifetime', 'width' => 'half', 'default' => 'years', 'help' => 'The plan starts when the application is approved.'],
+                ['name' => 'duration_value', 'label' => 'How many years / months', 'type' => 'number', 'rules' => 'nullable|required_if:duration_unit,years,months|integer|min:1|max:100', 'width' => 'half', 'help' => 'e.g. 5 for a five year membership. Ignored for Lifetime.'],
+                ['name' => 'fee', 'label' => 'Price (Rs.)', 'type' => 'number', 'rules' => 'nullable|numeric|min:0', 'width' => 'half', 'step' => '0.01', 'help' => 'Leave empty or 0 to make this membership free. With a price, the applicant must upload a payment voucher.'],
+                ['name' => 'sort_order', 'label' => 'Sort Order', 'type' => 'number', 'rules' => 'nullable|integer|min:0', 'width' => 'half', 'default' => 0],
+                ['name' => 'description', 'label' => 'Description', 'type' => 'textarea', 'rules' => 'nullable|string|max:1000', 'help' => 'Shown to applicants on the membership page.'],
+                ['name' => 'is_active', 'label' => 'Open for new applications', 'type' => 'checkbox', 'default' => true],
+            ],
+        ],
         // ---------------------------------------------------------------- Donations
         'donations' => [
             'group' => 'donation',

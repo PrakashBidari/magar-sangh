@@ -1,5 +1,5 @@
 <div class="bg-maroon-700 text-white text-sm">
-    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2">
         <div class="flex items-center gap-4">
             <a href="tel:{{ $siteSettings->phone }}" class="flex items-center gap-1.5 hover:text-gold-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z"/></svg>
@@ -10,7 +10,16 @@
                 <span class="hidden sm:inline">{{ $siteSettings->email }}</span>
             </a>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+            @auth
+            @php $activeMembership = auth()->user()->activeMembership()->with('type')->first(); @endphp
+            @if ($activeMembership)
+            <a href="{{ route('dashboard.my-membership.show') }}" title="Membership No. {{ $activeMembership->membership_number }}" class="flex max-w-[11rem] items-center gap-1.5 rounded-full bg-gold/90 px-2.5 py-0.5 text-xs font-bold text-navy hover:bg-gold sm:max-w-none">
+                <i class="fa-solid fa-id-card shrink-0"></i>
+                <span class="np truncate" data-np="{{ $activeMembership->type->name_np }}" data-en="{{ $activeMembership->type->name_en }}">{{ $activeMembership->type->name_np }}</span>
+            </a>
+            @endif
+            @endauth
             <button type="button" id="lang-toggle" class="flex items-center gap-1 font-semibold">
                 <span data-lang-option="np" class="lang-active">नेपाली</span>
                 <span class="text-white/50">|</span>

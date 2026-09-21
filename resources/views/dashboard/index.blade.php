@@ -31,8 +31,19 @@
     </div>
     @else
     <div class="card">
-        <p class="text-sm text-gray-600">You are signed in as a member. Content management tools are available to administrators only.</p>
-        <a href="{{ route('home') }}" class="btn-maroon mt-4">Visit the website</a>
+        @if ($membership?->isActive())
+            <div class="text-xs font-semibold uppercase text-gray-400">Your membership</div>
+            <div class="mt-1 text-lg font-bold text-navy">{{ $membership->type->name_en }} <span class="np text-sm font-semibold text-gray-500">· {{ $membership->type->name_np }}</span></div>
+            <p class="mt-1 text-sm text-gray-600">No. <span class="font-mono">{{ $membership->membership_number }}</span> · valid till {{ $membership->expires_at?->format('d M, Y') ?? 'lifetime' }}</p>
+            <a href="{{ route('dashboard.membership.card', $membership) }}" class="btn-maroon mt-4 !px-5 !py-2.5 text-sm">🎫 View ID card</a>
+        @elseif ($membership?->isPending())
+            <div class="text-lg font-bold text-navy">⏳ Your membership application is under review</div>
+            <a href="{{ route('dashboard.my-membership.show') }}" class="btn-maroon mt-4 !px-5 !py-2.5 text-sm">View application</a>
+        @else
+            <div class="text-lg font-bold text-navy">Become a member of the Nepal Magar Association</div>
+            <p class="mt-1 text-sm text-gray-600">Apply online, track your application and download your ID card.</p>
+            <a href="{{ route('dashboard.my-membership.show') }}" class="btn-maroon mt-4 !px-5 !py-2.5 text-sm">{{ $membership ? 'View my membership' : 'Apply for membership' }}</a>
+        @endif
     </div>
     @endrole
 </x-layouts.dashboard>
