@@ -1,10 +1,18 @@
 <?php
 
 use App\Models\Setting;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use WithFileUploads;
+
+    public $logo_file;
+    public $flag_file;
+    public $president_photo;
+
     public string $site_name_np = '';
     public string $site_name_en = '';
     public string $tagline_np = '';
@@ -37,7 +45,10 @@ new class extends Component
 
     public function mount(): void
     {
-        $this->fill(Setting::current()->only($this->fillableKeys()));
+        // Nullable columns come back as null, but the typed properties above expect strings / ints.
+        foreach (Setting::current()->only($this->fillableKeys()) as $key => $value) {
+            $this->{$key} = $value ?? (is_int($this->{$key}) ? 0 : '');
+        }
     }
 
     protected function fillableKeys(): array
@@ -52,15 +63,29 @@ new class extends Component
             'site_name_en' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
-            'logo_url' => ['nullable', 'string', 'max:500'],
-            'flag_url' => ['nullable', 'string', 'max:500'],
+            'logo_file' => ['nullable', 'image', 'max:2048'],
+            'flag_file' => ['nullable', 'image', 'max:2048'],
             'map_embed_url' => ['nullable', 'string', 'max:1000'],
+            'president_photo' => ['nullable', 'image', 'max:2048'],
         ];
     }
 
     public function save(): void
     {
         $this->validate();
+
+        $uploads = [
+            'logo_file' => ['logo_url', 'branding'],
+            'flag_file' => ['flag_url', 'branding'],
+            'president_photo' => ['president_photo_url', 'president'],
+        ];
+
+        foreach ($uploads as $fileProp => [$urlProp, $folder]) {
+            if ($this->{$fileProp}) {
+                $this->{$urlProp} = Storage::disk('public')->url($this->{$fileProp}->store($folder, 'public'));
+                $this->reset($fileProp);
+            }
+        }
 
         Setting::current()->update($this->only($this->fillableKeys()));
 
@@ -98,14 +123,24 @@ new class extends Component
                     <input type="text" wire:model="tagline_en" class="mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon">
                 </div>
                 <div>
-                    <label class="text-sm font-semibold text-gray-700">Logo URL</label>
-                    <input type="text" wire:model="logo_url" class="mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon">
-                    @if($logo_url)<img src="{{ $logo_url }}" class="mt-2 h-12 w-12 rounded-full object-cover">@endif
+                    <label class="text-sm font-semibold text-gray-700">Logo</label>
+                    <input type="file" wire:model="logo_file" accept="image/*" class="mt-1 w-full text-sm">
+                    @error('logo_file') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    @if($logo_file)
+                    <img src="{{ $logo_file->temporaryUrl() }}" class="mt-2 h-12 w-12 rounded-full object-cover">
+                    @elseif($logo_url)
+                    <img src="{{ $logo_url }}" class="mt-2 h-12 w-12 rounded-full object-cover">
+                    @endif
                 </div>
                 <div>
-                    <label class="text-sm font-semibold text-gray-700">Flag Image URL</label>
-                    <input type="text" wire:model="flag_url" class="mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon">
-                    @if($flag_url)<img src="{{ $flag_url }}" class="mt-2 h-8 w-auto object-contain">@endif
+                    <label class="text-sm font-semibold text-gray-700">Flag Image</label>
+                    <input type="file" wire:model="flag_file" accept="image/*" class="mt-1 w-full text-sm">
+                    @error('flag_file') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    @if($flag_file)
+                    <img src="{{ $flag_file->temporaryUrl() }}" class="mt-2 h-8 w-auto object-contain">
+                    @elseif($flag_url)
+                    <img src="{{ $flag_url }}" class="mt-2 h-8 w-auto object-contain">
+                    @endif
                 </div>
             </div>
         </section>
@@ -183,8 +218,14 @@ new class extends Component
                         <input type="text" wire:model="president_name_np" class="np mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon">
                     </div>
                     <div>
-                        <label class="text-sm font-semibold text-gray-700">President Photo URL</label>
-                        <input type="text" wire:model="president_photo_url" class="mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon">
+                        <label class="text-sm font-semibold text-gray-700">President Photo</label>
+                        <input type="file" wire:model="president_photo" accept="image/*" class="mt-1 w-full text-sm">
+                        @error('president_photo') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        @if ($president_photo)
+                        <img src="{{ $president_photo->temporaryUrl() }}" class="mt-2 h-16 w-16 rounded-full object-cover">
+                        @elseif ($president_photo_url)
+                        <img src="{{ $president_photo_url }}" class="mt-2 h-16 w-16 rounded-full object-cover">
+                        @endif
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -209,7 +250,8 @@ new class extends Component
         </section>
 
         <section class="card">
-            <h2 class="font-bold text-navy">Static Pages</h2>
+            <h2 class="font-bold text-navy">About Us Pages</h2>
+            <p class="mt-1 text-xs text-gray-500">Shown on the About Us menu: Our History, Mission &amp; Vision and Constitution. The editor supports images, font sizes, colours, tables and video embeds.</p>
             <div class="mt-4 space-y-6">
                 <div wire:ignore>
                     <label class="text-sm font-semibold text-gray-700">Our History</label>
@@ -236,29 +278,14 @@ new class extends Component
 
     @script
     <script>
-        let wire = $wire;
+        const wire = $wire;
 
-        function initCkEditors() {
-            document.querySelectorAll('.ckeditor-field').forEach((el) => {
-                if (el.dataset.ckInitialized) return;
-                el.dataset.ckInitialized = '1';
+        document.querySelectorAll('.ckeditor-field').forEach((el) => {
+            if (el.dataset.ckInitialized) return;
+            el.dataset.ckInitialized = '1';
 
-                ClassicEditor.create(el).then((editor) => {
-                    editor.model.document.on('change:data', () => {
-                        wire.set(el.dataset.field, editor.getData(), false);
-                    });
-                });
-            });
-        }
-
-        if (window.ClassicEditor) {
-            initCkEditors();
-        } else {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js';
-            script.onload = initCkEditors;
-            document.head.appendChild(script);
-        }
+            NepalRichEditor.init(el, (html) => wire.set(el.dataset.field, html, false));
+        });
     </script>
     @endscript
 </div>

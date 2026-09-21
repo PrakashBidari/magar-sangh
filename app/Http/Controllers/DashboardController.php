@@ -2,37 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Article;
 use App\Models\ContactMessage;
 use App\Models\Donation;
+use App\Models\Event;
+use App\Models\GalleryPhoto;
+use App\Models\News;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stats = [
-            'users' => User::count(),
-            'donations' => Donation::count(),
-            'donation_total' => Donation::sum('amount'),
-            'messages' => ContactMessage::count(),
-        ];
+        $stats = [];
 
-        return view('dashboard.index', compact('stats'));
-    }
+        if ($request->user()->hasRole('admin')) {
+            $stats = [
+                ['label' => 'Total Users', 'value' => number_format(User::count()), 'route' => 'dashboard.users.index'],
+                ['label' => 'Donations', 'value' => number_format(Donation::count()), 'route' => 'dashboard.donations.index'],
+                ['label' => 'Donation Amount', 'value' => 'Rs. '.number_format(Donation::sum('amount'), 2), 'route' => 'dashboard.donations.index', 'accent' => true],
+                ['label' => 'Contact Messages', 'value' => number_format(ContactMessage::count()), 'route' => 'dashboard.messages.index'],
+                ['label' => 'News', 'value' => number_format(News::count()), 'route' => 'dashboard.news.index'],
+                ['label' => 'Articles', 'value' => number_format(Article::count()), 'route' => 'dashboard.articles.index'],
+                ['label' => 'Events', 'value' => number_format(Event::count()), 'route' => 'dashboard.events.index'],
+                ['label' => 'Gallery Photos', 'value' => number_format(GalleryPhoto::count()), 'route' => 'dashboard.gallery-photos.index'],
+            ];
+        }
 
-    public function users()
-    {
-        return view('dashboard.users');
-    }
-
-    public function userShow(User $user)
-    {
-        return view('dashboard.user-show', compact('user'));
-    }
-
-    public function donations()
-    {
-        return view('dashboard.donations');
+        return view('dashboard.index', ['stats' => $stats, 'user' => $request->user()]);
     }
 
     public function settings()

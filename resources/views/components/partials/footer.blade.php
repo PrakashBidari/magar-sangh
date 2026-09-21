@@ -1,6 +1,4 @@
 <footer class="bg-navy text-gray-200">
-    <div class="h-20 w-full bg-cover bg-center opacity-40" style="background-image: url('https://picsum.photos/seed/himalaya-range/1600/200')"></div>
-
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 md:grid-cols-4">
         <div>
             <div class="flex items-center gap-3">

@@ -52,21 +52,12 @@
             </li>
 
             <li>
-                <a href="{{ route('donation-list') }}" class="{{ $navItem }} {{ $isActive('donation-list') }} flex-col !items-start justify-center leading-tight">
-                    <span>Donation List</span>
-                    <span class="text-[10px] font-normal normal-case text-gold-300">Lakhan Thapa Pratisthan</span>
-                </a>
+                <a href="{{ route('donation-list') }}" class="{{ $navItem }} {{ $isActive('donation-list') }}">Lakhan Thapa Pratisthan</a>
             </li>
 
             <li>
                 <a href="{{ route('contact') }}" class="{{ $navItem }} {{ $isActive('contact') }}">Contact Us</a>
             </li>
-
-            @auth
-            <li>
-                <a href="{{ route('dashboard.index') }}" class="{{ $navItem }}">Dashboard</a>
-            </li>
-            @endauth
         </ul>
     </div>
 </nav>

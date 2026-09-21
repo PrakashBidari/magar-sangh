@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Admin\EditorUploadController;
+use App\Http\Controllers\Admin\ResourceController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -50,10 +52,26 @@ Route::get('/donation-list', function () {
     return view('donation-list');
 })->name('donation-list');
 
-Route::middleware(['auth', 'role:admin|editor'])->prefix('dashboard')->name('dashboard.')->group(function () {
+Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function () {
+    // Every signed-in account (admin or user) gets the dashboard home.
     Route::get('/', [DashboardController::class, 'index'])->name('index');
-    Route::get('/users', [DashboardController::class, 'users'])->middleware('role:admin')->name('users');
-    Route::get('/users/{user}', [DashboardController::class, 'userShow'])->middleware('role:admin')->name('users.show');
-    Route::get('/donations', [DashboardController::class, 'donations'])->middleware('role:admin')->name('donations');
-    Route::get('/settings', [DashboardController::class, 'settings'])->middleware('role:admin')->name('settings');
+
+    // Content management is admin only.
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+        Route::post('/editor-upload', EditorUploadController::class)->name('editor-upload');
+
+        Route::prefix('manage')->group(function () {
+            foreach (config('admin.resources') as $key => $cfg) {
+                $registrar = Route::resource($key, $cfg['controller'] ?? ResourceController::class)
+                    ->parameters([$key => 'id']);
+
+                if ($cfg['readonly'] ?? false) {
+                    $registrar->only(['index', 'show', 'destroy']);
+                } else {
+                    $registrar->except(['show']);
+                }
+            }
+        });
+    });
 });

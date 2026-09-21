@@ -148,7 +148,7 @@ function initSwipers() {
         heroEl.dataset.swiperInit = '1';
         new Swiper(heroEl, {
             modules: [Autoplay, Pagination],
-            loop: true,
+            loop: heroEl.querySelectorAll('.swiper-slide').length > 1,
             autoplay: { delay: 5000, disableOnInteraction: false },
             pagination: { el: '.swiper-pagination', clickable: true },
         });
@@ -180,15 +180,28 @@ function initDashboardSidebar() {
 
     const open = () => {
         sidebar.classList.remove('-translate-x-full');
-        overlay.classList.remove('hidden');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
     };
     const close = () => {
         sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
+        overlay.classList.add('opacity-0', 'pointer-events-none');
     };
 
     toggle.addEventListener('click', open);
     overlay.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => e.key === 'Escape' && close());
+
+    // Collapsible menu groups (animated with CSS, see .nav-group in app.css)
+    sidebar.querySelectorAll('.nav-group').forEach((group) => {
+        const button = group.querySelector('.nav-group-toggle');
+        button.addEventListener('click', () => {
+            const isOpen = group.classList.toggle('is-open');
+            button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+    });
+
+    // Bring the current page into view in a long menu
+    sidebar.querySelector('.dash-sublink.is-active, .dash-link.is-active')?.scrollIntoView({ block: 'nearest' });
 }
 
 document.addEventListener('DOMContentLoaded', initDashboardSidebar);

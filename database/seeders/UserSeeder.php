@@ -15,11 +15,6 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole('admin');
 
-        $editor = User::firstOrCreate(
-            ['email' => 'editor@nepalmagar.org.np'],
-            ['name' => 'Editor User', 'password' => bcrypt('password'), 'email_verified_at' => now()]
-        );
-        $editor->assignRole('editor');
 
         $user = User::firstOrCreate(
             ['email' => 'user@nepalmagar.org.np'],

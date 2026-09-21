@@ -1,7 +1,4 @@
 <header class="relative overflow-hidden bg-white">
-    <div class="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-cover bg-center opacity-20"
-         style="background-image: url('https://picsum.photos/seed/himalaya-range/800/400')"></div>
-
     <div class="relative mx-auto grid max-w-7xl grid-cols-3 items-center gap-4 px-4 py-4">
         <div class="flex justify-start">
             <a href="{{ route('home') }}">

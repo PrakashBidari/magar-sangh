@@ -6,6 +6,7 @@ use App\Models\CommitteeMember;
 use App\Models\Event;
 use App\Models\GalleryPhoto;
 use App\Models\GalleryVideo;
+use App\Models\HeroSlide;
 use App\Models\News;
 use App\Models\Setting;
 use App\Models\SisterOrganization;
@@ -15,6 +16,8 @@ class HomeController extends Controller
     public function index()
     {
         $settings = Setting::current();
+
+        $heroSlides = HeroSlide::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
 
         $pastPresidents = CommitteeMember::where('is_past_president', true)
             ->orderBy('sort_order')
@@ -29,7 +32,7 @@ class HomeController extends Controller
         $sisterOrganizations = SisterOrganization::orderBy('sort_order')->get();
 
         return view('home', compact(
-            'settings', 'pastPresidents', 'latestNews', 'upcomingEvent', 'photos', 'videos', 'sisterOrganizations'
+            'settings', 'heroSlides', 'pastPresidents', 'latestNews', 'upcomingEvent', 'photos', 'videos', 'sisterOrganizations'
         ));
     }
 }

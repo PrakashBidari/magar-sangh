@@ -16,6 +16,20 @@
                 <span class="text-white/50">|</span>
                 <span data-lang-option="en" class="text-white/70">English</span>
             </button>
+            <div class="flex items-center gap-3 text-xs font-semibold sm:text-sm">
+                @auth
+                <a href="{{ route('dashboard.index') }}" class="flex items-center gap-1 rounded bg-white/15 px-2.5 py-1 hover:bg-white/25">
+                    <i class="fa-solid fa-gauge-high"></i> <span>Dashboard</span>
+                </a>
+                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                    @csrf
+                    <button type="submit" class="hover:text-gold-200">Logout</button>
+                </form>
+                @else
+                <a href="{{ route('login') }}" class="hover:text-gold-200">Login</a>
+                <a href="{{ route('register') }}" class="rounded bg-white/15 px-2.5 py-1 hover:bg-white/25">Register</a>
+                @endauth
+            </div>
             <div class="hidden items-center gap-3 sm:flex">
                 @if($siteSettings->facebook_url)
                 <a href="{{ $siteSettings->facebook_url }}" target="_blank" rel="noopener" aria-label="Facebook" class="hover:text-gold-200">

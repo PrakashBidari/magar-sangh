@@ -19,6 +19,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^7.3.1",
         "glightbox": "^3.3.1",
+        "jodit": "^4.15.3",
         "swiper": "^14.2.0"
     }
 }

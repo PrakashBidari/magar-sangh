@@ -4,45 +4,15 @@
     <section class="relative overflow-hidden bg-navy-900">
         <div class="swiper hero-swiper">
             <div class="swiper-wrapper">
-                @foreach (['nepal,mountains,himalaya', 'traditional,dance,festival', 'nepal,culture,drums'] as $i => $keyword)
-                <div class="swiper-slide">
-                    <div class="relative h-[520px] w-full md:h-[620px]">
-                        <img src="https://picsum.photos/seed/hero-{{ $i }}/1600/900" alt="Magar cultural dancers with Himalayan backdrop" class="absolute inset-0 h-full w-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20"></div>
-                    </div>
-                </div>
-                @endforeach
+                @forelse ($heroSlides as $slide)
+                    @include('partials.hero-slide', ['slide' => $slide])
+                @empty
+                    @include('partials.hero-slide', ['slide' => null])
+                @endforelse
             </div>
             <div class="swiper-pagination"></div>
         </div>
-
-        <div class="pointer-events-none absolute inset-0 flex items-center">
-            <div class="pointer-events-auto mx-auto w-full max-w-7xl px-4">
-                <div class="max-w-2xl">
-                    <h1 class="np text-2xl font-extrabold leading-snug text-maroon-300 drop-shadow md:text-4xl">
-                        हाम्रो भाषा, हाम्रो संस्कृति, हाम्रो पहिचान – हाम्रो गौरव
-                    </h1>
-                    <h2 class="mt-2 text-xl font-extrabold uppercase tracking-wide text-white drop-shadow md:text-3xl">
-                        Our Language, Our Culture, Our Identity – Our Pride
-                    </h2>
-                    <p class="mt-4 text-sm text-gray-200 md:text-base">
-                        {{ $settings->about_short_en }}
-                    </p>
-                    <div class="mt-6 flex flex-wrap gap-4">
-                        <a href="{{ route('register') }}" class="btn-maroon">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-3a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0"/></svg>
-                            Become a Member
-                        </a>
-                        <a href="{{ route('donation-list') }}" class="btn-navy-outline">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 10v2"/></svg>
-                            Donate Now
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </section>
-    <div class="hero-gradient-bridge"></div>
 
     {{-- PRESIDENT MESSAGE --}}
     <section class="mx-auto max-w-7xl px-4 py-14">
