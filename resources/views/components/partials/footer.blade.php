@@ -2,7 +2,9 @@
     <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-12 md:grid-cols-4">
         <div>
             <div class="flex items-center gap-3">
-                <img src="{{ $siteSettings->logo_url }}" alt="{{ $siteSettings->site_name_en }}" class="h-14 w-14 rounded-full object-cover">
+                @if ($siteSettings->logo_url)
+                <img src="{{ $siteSettings->logo_url }}" alt="{{ $siteSettings->site_name_en }}" class="h-16 w-auto rounded-md bg-white object-contain p-1">
+                @endif
                 <div>
                     <div class="np text-lg font-bold text-white">{{ $siteSettings->site_name_np }}</div>
                     <div class="font-heading text-xs font-semibold uppercase text-gold-300">{{ $siteSettings->site_name_en }}</div>
@@ -45,9 +47,11 @@
 
         <div>
             <h3 class="font-heading mb-4 text-sm font-bold uppercase tracking-wider text-gold-300">Our Location</h3>
+            @if ($siteSettings->map_embed_url)
             <div class="overflow-hidden rounded-lg border border-white/10">
                 <iframe src="{{ $siteSettings->map_embed_url }}" class="h-40 w-full" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Our Location"></iframe>
             </div>
+            @endif
         </div>
     </div>
 

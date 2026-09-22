@@ -6,7 +6,7 @@
         <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($organizations as $org)
             <div class="card flex flex-col items-center text-center">
-                <img src="{{ $org->logo_url }}" alt="{{ $org->name_en }}" class="h-20 w-20 rounded-full object-cover shadow">
+                <img src="{{ $org->logo_url }}" alt="{{ $org->name_en }}" class="h-20 w-20 rounded-md bg-white object-contain p-1 shadow">
                 <h2 class="mt-4 font-bold text-navy">{{ $org->name_en }}</h2>
                 <p class="np text-sm text-maroon">{{ $org->name_np }}</p>
                 <p class="mt-2 flex-1 text-sm text-gray-600">{{ $org->blurb }}</p>

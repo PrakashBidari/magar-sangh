@@ -1,13 +1,12 @@
 @props(['title' => null])
 <!DOCTYPE html>
-<html lang="ne" data-lang="np" translate="no" class="notranslate">
+<html lang="ne" data-lang="np">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="google" content="notranslate">
     <title>{{ $title ? $title.' - ' : '' }}{{ $siteSettings->site_name_en }}</title>
     <meta name="description" content="{{ $siteSettings->about_short_en }}">
-    <link rel="icon" href="{{ $siteSettings->logo_url }}">
+    @if ($siteSettings->logo_url)<link rel="icon" href="{{ $siteSettings->logo_url }}">@endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -21,6 +20,8 @@
     </main>
 
     <x-partials.footer />
+
+    <div id="google_translate_element"></div>
 
     @livewireScripts
 </body>

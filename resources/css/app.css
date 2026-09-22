@@ -239,3 +239,21 @@ body {
 .prose video {
     max-width: 100%;
 }
+
+/* Google Website Translator: keep the toggle in the topbar as the only UI,
+   hide Google's own widget/banner/tooltips entirely */
+#google_translate_element,
+.goog-te-banner-frame,
+.goog-te-gadget-icon,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-te-balloon-frame {
+    display: none !important;
+}
+body {
+    top: 0 !important;
+}
+.goog-text-highlight {
+    background: none !important;
+    box-shadow: none !important;
+}

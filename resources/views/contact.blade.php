@@ -23,9 +23,13 @@
                     </div>
                 </div>
 
+                @if ($settings->map_embed_url)
+
                 <div class="card overflow-hidden p-0">
                     <iframe src="{{ $settings->map_embed_url }}" class="h-64 w-full" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Our Location"></iframe>
                 </div>
+
+                @endif
             </div>
         </div>
     </section>

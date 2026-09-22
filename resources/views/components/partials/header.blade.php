@@ -2,7 +2,9 @@
     <div class="relative mx-auto grid max-w-7xl grid-cols-3 items-center gap-4 px-4 py-4">
         <div class="flex justify-start">
             <a href="{{ route('home') }}">
-                <img src="{{ $siteSettings->logo_url }}" alt="{{ $siteSettings->site_name_en }} Logo" class="h-16 w-16 rounded-full object-cover shadow md:h-20 md:w-20">
+                @if ($siteSettings->logo_url)
+                <img src="{{ $siteSettings->logo_url }}" alt="{{ $siteSettings->site_name_en }} Logo" class="h-20 w-auto object-contain md:h-24">
+                @endif
             </a>
         </div>
         <div class="text-center">
@@ -16,7 +18,9 @@
             </div>
         </div>
         <div class="flex justify-end">
+            @if ($siteSettings->flag_url)
             <img src="{{ $siteSettings->flag_url }}" alt="Nepal Flag" class="h-14 w-auto object-contain md:h-16">
+            @endif
         </div>
     </div>
 </header>

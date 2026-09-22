@@ -11,6 +11,7 @@ restorePaginationScroll();
 
 document.addEventListener('DOMContentLoaded', () => {
     initNav();
+    initGoogleTranslate();
     initLanguageToggle();
     initGalleryTabs();
     initLightbox();
@@ -77,6 +78,51 @@ function initNav() {
     }
 }
 
+// Loads Google's Website Translator so content that isn't manually
+// translated (e.g. admin-entered text) still gets converted both ways when
+// the visitor switches between नेपाली and English. Its own widget/banner UI
+// is hidden via CSS (see app.css) — the topbar toggle is the only visible
+// language control.
+function initGoogleTranslate() {
+    if (document.getElementById('google-translate-script')) return;
+
+    window.googleTranslateElementInit = function () {
+        // eslint-disable-next-line no-undef
+        new google.translate.TranslateElement(
+            {
+                pageLanguage: 'ne',
+                includedLanguages: 'en,ne',
+                autoDisplay: false,
+            },
+            'google_translate_element'
+        );
+    };
+
+    const script = document.createElement('script');
+    script.id = 'google-translate-script';
+    script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.async = true;
+    document.head.appendChild(script);
+}
+
+// Drives the hidden Google Translate <select> that the widget injects.
+// The select isn't available until element.js finishes loading, so retry
+// briefly instead of failing silently on the first click.
+function setGoogleTranslateLanguage(lang, attempt = 0) {
+    const combo = document.querySelector('select.goog-te-combo');
+
+    if (combo) {
+        if (combo.value === lang) return;
+        combo.value = lang;
+        combo.dispatchEvent(new Event('change'));
+        return;
+    }
+
+    if (attempt < 50) {
+        setTimeout(() => setGoogleTranslateLanguage(lang, attempt + 1), 100);
+    }
+}
+
 function initLanguageToggle() {
     const toggle = document.getElementById('lang-toggle');
     if (!toggle) return;
@@ -91,6 +137,10 @@ function initLanguageToggle() {
         document.querySelectorAll('[data-np][data-en]').forEach((el) => {
             el.textContent = lang === 'np' ? el.dataset.np : el.dataset.en;
         });
+        // Explicitly drive Google Translate to 'ne' or 'en' both ways —
+        // resetting via an empty value is unreliable once the widget has
+        // already translated the page once.
+        setGoogleTranslateLanguage(lang === 'en' ? 'en' : 'ne');
     };
 
     const saved = localStorage.getItem('lang') || 'np';
