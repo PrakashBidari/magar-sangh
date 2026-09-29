@@ -17,8 +17,14 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\SisterOrganizationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/storagelink', function () {
+    Artisan::call('storage:link');
+    return 'Storage link created!';
+});
 
 Route::prefix('about')->name('about.')->group(function () {
     Route::get('/', [AboutController::class, 'index'])->name('index');
