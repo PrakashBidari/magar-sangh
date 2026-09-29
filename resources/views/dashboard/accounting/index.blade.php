@@ -236,7 +236,7 @@
                 .rp { box-sizing: border-box; width: ${PAGE_W}px; height: ${PAGE_H}px; padding: ${PAD}px; background: #fff; color: #1f2937; font-size: 12px; line-height: 1.35; position: relative; overflow: hidden; }
                 .rp * { box-sizing: border-box; }
                 .rp table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-                .rp th { padding: 7px 8px; background: #001F5B; color: #fff; font-size: 10.5px; text-align: left; letter-spacing: .04em; text-transform: uppercase; }
+                .rp th { padding: 7px 8px; background: #0077bb; color: #fff; font-size: 10.5px; text-align: left; letter-spacing: .04em; text-transform: uppercase; }
                 .rp td { padding: 6px 8px; border-bottom: 1px solid #e5e7eb; vertical-align: top; word-break: break-word; }
                 .rp .r { text-align: right; }
                 .rp .inc { color: #15803d; } .rp .exp { color: #b91c1c; }
@@ -263,14 +263,14 @@
             if (showIncome && showExpense) totalRows.push(['Balance', balance < 0 ? 'exp' : '', `${balance < 0 ? '− ' : ''}Rs. ${money(Math.abs(balance))}`]);
             const totalsHtml = totalRows.map(([label, cls, value], i) => `<tr class="tot">
                 <td colspan="6" class="r" style="${i === 0 ? 'padding-top:10px' : ''}">${label}</td>
-                <td class="r ${cls}" style="${i === 0 ? 'padding-top:10px' : ''}${label === 'Balance' ? ';border-top:2px solid #001F5B' : ''}">${value}</td></tr>`).join('');
+                <td class="r ${cls}" style="${i === 0 ? 'padding-top:10px' : ''}${label === 'Balance' ? ';border-top:2px solid #0077bb' : ''}">${value}</td></tr>`).join('');
 
             const firstHead = () => `<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #D4AF37;padding-bottom:8px">
                     <div><div style="font-size:20px;font-weight:800;color:#8B0000">${esc(report.orgNp)}</div><div style="font-size:11px;color:#6b7280">${esc(report.org)}</div></div>
-                    <div style="text-align:right"><div style="font-size:16px;font-weight:800;color:#001F5B">${esc(report.title)}</div><div style="font-size:10.5px;color:#6b7280">Generated ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div></div>
+                    <div style="text-align:right"><div style="font-size:16px;font-weight:800;color:#0077bb">${esc(report.title)}</div><div style="font-size:10.5px;color:#6b7280">Generated ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div></div>
                 </div>
                 <div style="margin:8px 0 10px;color:#4b5563;font-size:11px">${report.filters.length ? report.filters.map(esc).join(' &nbsp;·&nbsp; ') : 'All entries'} &nbsp;·&nbsp; <b>${rows.length}</b> ${rows.length === 1 ? 'entry' : 'entries'}</div>`;
-            const nextHead = () => `<div style="border-bottom:2px solid #D4AF37;padding-bottom:6px;margin-bottom:10px;font-weight:700;color:#001F5B">${esc(report.title)} <span style="font-weight:400;color:#6b7280">(continued)</span></div>`;
+            const nextHead = () => `<div style="border-bottom:2px solid #D4AF37;padding-bottom:6px;margin-bottom:10px;font-weight:700;color:#0077bb">${esc(report.title)} <span style="font-weight:400;color:#6b7280">(continued)</span></div>`;
 
             async function buildPdf() {
                 await (document.fonts ? document.fonts.ready : Promise.resolve());

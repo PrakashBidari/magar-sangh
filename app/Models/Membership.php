@@ -33,7 +33,14 @@ class Membership extends Model
             'approved_at' => 'datetime',
             'expires_at' => 'datetime',
             'rejected_at' => 'datetime',
+            'fee_paid' => 'decimal:2',
         ];
+    }
+
+    /** All membership fees collected: the fee recorded on every approved membership. */
+    public static function totalCollected(): float
+    {
+        return (float) static::query()->where('status', self::APPROVED)->sum('fee_paid');
     }
 
     public function user(): BelongsTo
@@ -124,6 +131,7 @@ class Membership extends Model
             'membership_number' => $this->membership_number ?: self::numberFor($this),
             'approved_at' => $now,
             'expires_at' => $this->type->expiryFrom($now),
+            'fee_paid' => (float) $this->type->fee,
             'rejected_at' => null,
             'rejection_reason' => null,
             'reviewed_by' => $reviewer->getKey(),
@@ -136,6 +144,7 @@ class Membership extends Model
             'status' => self::REJECTED,
             'approved_at' => null,
             'expires_at' => null,
+            'fee_paid' => 0,
             'rejected_at' => now(),
             'rejection_reason' => $reason,
             'reviewed_by' => $reviewer->getKey(),

@@ -18,6 +18,7 @@ class Setting extends Model
         'about_short_np', 'about_short_en',
         'president_message_np', 'president_name_np', 'president_photo_url',
         'stat_members', 'stat_districts', 'stat_countries', 'stat_sister_orgs',
+        'authorized_signature_url', 'donation_page_content',
     ];
 
     public static function current(): self

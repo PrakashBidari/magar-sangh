@@ -128,7 +128,7 @@ body {
 /* ------------------------------------------------------------------ Dashboard sidebar */
 @layer components {
     .dash-link {
-        @apply relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-white/80 transition-all duration-200 hover:bg-white/10 hover:text-white;
+        @apply relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:text-white;
     }
     .dash-link.is-active {
         @apply bg-white/15 text-white;
@@ -154,15 +154,15 @@ body {
         background: rgba(212, 175, 55, 0.28);
     }
     .dash-section-label {
-        @apply px-3 pb-1 pt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-white/40;
+        @apply px-3 pb-1 pt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-white;
     }
     .dash-badge {
-        @apply rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/70;
+        @apply rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white;
     }
 
     /* Collapsible groups: the panel height animates from 0fr to 1fr, items fade in one after another. */
     .nav-chevron {
-        @apply h-4 w-4 shrink-0 text-white/60;
+        @apply h-4 w-4 shrink-0 text-white;
         transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .nav-group.is-open .nav-chevron {
@@ -186,7 +186,7 @@ body {
         transition-delay: 0s;
     }
     .dash-sublink {
-        @apply relative flex items-center gap-2 rounded-md py-2 pl-4 pr-3 text-[13px] font-medium text-white/70 hover:bg-white/10 hover:text-white;
+        @apply relative flex items-center gap-2 rounded-md py-2 pl-4 pr-3 text-[13px] font-medium text-white hover:bg-white/10 hover:text-white;
         opacity: 0;
         transform: translateX(-8px);
         transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s, color 0.2s;

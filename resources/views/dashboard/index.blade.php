@@ -11,6 +11,16 @@
     </div>
 
     @role('admin')
+    <h2 class="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500">Money collected</h2>
+    <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        @foreach ($money as $item)
+        <a href="{{ $item['route'] }}" class="card border-t-4 border-navy transition hover:shadow-lg">
+            <div class="flex items-center gap-2 text-xs font-semibold uppercase text-gray-400"><span>{{ $item['icon'] }}</span> {{ $item['label'] }}</div>
+            <div class="mt-2 text-xl font-extrabold sm:text-2xl {{ ($item['negative'] ?? false) || $item['value'] < 0 ? 'text-red-600' : 'text-navy' }}">Rs. {{ number_format($item['value'], 2) }}</div>
+        </a>
+        @endforeach
+    </div>
+
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($stats as $stat)
         <a href="{{ route($stat['route']) }}" class="card transition hover:shadow-lg">

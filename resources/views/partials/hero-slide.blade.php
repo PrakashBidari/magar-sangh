@@ -17,7 +17,7 @@
                     <h1 class="np text-2xl font-extrabold leading-snug text-maroon-300 drop-shadow md:text-4xl">{{ $titleNp }}</h1>
                     <h2 class="mt-2 text-xl font-extrabold uppercase tracking-wide text-white drop-shadow md:text-3xl">{{ $titleEn }}</h2>
                     @if ($text)
-                    <p class="mt-4 text-sm text-gray-200 md:text-base">{{ $text }}</p>
+                    <p class="mt-4 text-sm text-white md:text-base">{{ $text }}</p>
                     @endif
                     <div class="mt-6 flex flex-wrap gap-4">
                         <a href="{{ route('register') }}" class="btn-maroon">

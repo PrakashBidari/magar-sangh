@@ -18,7 +18,7 @@
                 @endif
             </a>
             <div class="np mt-3 text-xl font-extrabold text-white">{{ $siteSettings->site_name_np }}</div>
-            <div class="text-xs font-semibold uppercase tracking-wide text-gold-300">{{ $siteSettings->site_name_en }}</div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-white">{{ $siteSettings->site_name_en }}</div>
         </div>
 
         <div class="rounded-lg bg-white p-8 shadow-xl">
@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        <p class="mt-6 text-center text-xs text-gray-300">
+        <p class="mt-6 text-center text-xs text-white">
             <a href="{{ route('home') }}" class="hover:text-white">← Back to Website</a>
         </p>
     </div>

@@ -22,6 +22,14 @@
     <div class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{{ session('dashboard-error') }}</div>
     @endif
 
+    {{-- Optional money total above the table (e.g. donations), set with 'summary' in config/admin.php --}}
+    @isset ($cfg['summary'])
+    <div class="mt-5 flex flex-col gap-1 rounded-lg bg-navy p-5 text-white shadow-md sm:flex-row sm:items-center sm:justify-between">
+        <div class="text-sm font-semibold uppercase tracking-wider">{{ $cfg['summary']['label'] }}</div>
+        <div class="text-2xl font-extrabold sm:text-3xl">Rs. {{ number_format((float) $cfg['model']::sum($cfg['summary']['sum']), 2) }}</div>
+    </div>
+    @endisset
+
     <div class="mt-5 rounded-lg bg-white p-3 shadow-md sm:p-4">
         <table id="resource-table" class="display w-full text-sm" style="width:100%">
             <thead>

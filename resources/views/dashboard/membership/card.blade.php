@@ -12,18 +12,18 @@
         /* The card is drawn at a fixed 324 x 514 px (CR80 ratio, 54 x 85.6 mm) so the exported image is always identical. */
         .id-card { position: relative; display: flex; flex-direction: column; width: 324px; height: 514px; overflow: hidden; border-radius: 16px; background: #fff; color: #1f2937; font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif; }
         .id-card * { box-sizing: border-box; }
-        .id-shadow { border-radius: 16px; box-shadow: 0 18px 40px -12px rgba(0, 31, 91, .45), 0 4px 10px rgba(0, 0, 0, .12); }
-        .id-head { position: relative; flex-shrink: 0; height: 112px; padding: 10px 16px 0; background: linear-gradient(135deg, #8B0000 0%, #5c0000 60%, #001F5B 140%); color: #fff; }
+        .id-shadow { border-radius: 16px; box-shadow: 0 18px 40px -12px rgba(0, 119, 187, .45), 0 4px 10px rgba(0, 0, 0, .12); }
+        .id-head { position: relative; flex-shrink: 0; height: 100px; padding: 10px 16px 0; background: #0077bb; color: #fff; }
         .id-head::after { content: ''; position: absolute; right: -40px; top: -40px; width: 150px; height: 150px; border-radius: 50%; background: rgba(212, 175, 55, .16); }
         .id-head::before { content: ''; position: absolute; left: -30px; bottom: -60px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255, 255, 255, .07); }
         .id-gold { flex-shrink: 0; height: 5px; background: linear-gradient(90deg, #D4AF37, #f2dc8a, #D4AF37); }
-        .id-org { min-width: 0; font-family: 'Yatra One', 'Noto Sans Devanagari', serif; font-size: 30px; font-weight: 400; line-height: 1.15; letter-spacing: .01em; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .35); white-space: nowrap; }
+        .id-org { min-width: 0; font-family: 'Yatra One', 'Noto Sans Devanagari', serif; font-size: 24px; font-weight: 400; line-height: 1.15; letter-spacing: .01em; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .35); white-space: nowrap; }
         .id-logo { width: 44px; height: 52px; flex-shrink: 0; padding: 3px; border-radius: 8px; background: #fff center / contain no-repeat; background-origin: content-box; border: 2px solid #D4AF37; }
         .id-photo { flex-shrink: 0; width: 96px; height: 96px; margin: -32px auto 0; position: relative; z-index: 2; border-radius: 50%; border: 4px solid #fff; outline: 2px solid #D4AF37; background: #e5e7eb center / cover no-repeat; box-shadow: 0 6px 14px rgba(0, 0, 0, .25); }
         .id-label { font-size: 8.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; }
         .id-value { margin-top: 1px; font-size: 11.5px; font-weight: 600; color: #111827; line-height: 1.3; word-break: break-word; }
         .id-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 7px 14px; text-align: left; }
-        .id-foot { flex-shrink: 0; padding: 8px 12px; background: #001F5B; color: #fff; font-size: 9.5px; line-height: 1.45; text-align: center; border-top: 3px solid #D4AF37; }
+        .id-foot { flex-shrink: 0; padding: 8px 12px; background: #0077bb; color: #fff; font-size: 9.5px; line-height: 1.45; text-align: center; border-top: 3px solid #D4AF37; }
         .id-watermark { position: absolute; left: 50%; top: 58%; width: 260px; height: 300px; transform: translate(-50%, -50%); opacity: .06; background: center / contain no-repeat; }
         .id-stamp { position: absolute; left: 50%; top: 52%; z-index: 5; transform: translate(-50%, -50%) rotate(-24deg); padding: 6px 20px; border: 4px solid #dc2626; border-radius: 8px; color: #dc2626; font-size: 34px; font-weight: 900; letter-spacing: .1em; background: rgba(255, 255, 255, .55); }
     </style>
@@ -60,9 +60,11 @@
                         <div class="id-head">
                             <div class="relative z-10 flex items-center justify-center gap-3">
                                 @if ($siteSettings->logo_url)<div class="id-logo" style="background-image:url('{{ $siteSettings->logo_url }}')"></div>@endif
-                                <div class="id-org np">{{ $siteSettings->site_name_np }}</div>
+                                <div class="min-w-0 text-left">
+                                    <div class="id-org np">{{ $siteSettings->site_name_np }}</div>
+                                    <div style="font-size:15px;line-height:1.2;font-weight:600;color:#fff">Central Committee</div>
+                                </div>
                             </div>
-                            <div class="relative z-10" style="margin-top:3px;text-align:center;font-size:9.5px;line-height:1.2;font-weight:800;letter-spacing:.32em;color:#f2dc8a">MEMBERSHIP CARD</div>
                         </div>
                         <div class="id-gold"></div>
 
@@ -70,7 +72,10 @@
 
                         {{-- space-evenly: every gap (photo > name > details > signatures > validity > footer) is the same height --}}
                         <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:space-evenly;padding:0 18px">
-                            <div style="text-align:center;font-size:18px;font-weight:800;line-height:1.2;color:#001F5B;word-break:break-word">{{ $membership->displayName() }}</div>
+                            <div style="text-align:center">
+                                <div style="font-size:18px;font-weight:800;line-height:1.2;color:#0077bb;word-break:break-word">{{ $membership->displayName() }}</div>
+                                <div style="margin-top:3px;font-size:9.5px;line-height:1.2;font-weight:800;letter-spacing:.32em;color:#b3901e">MEMBERSHIP CARD</div>
+                            </div>
 
                             <div class="id-grid" style="padding-top:8px;border-top:1.5px solid #D4AF37">
                                 <div><div class="id-label">Phone</div><div class="id-value">{{ $membership->mobile }}</div></div>
@@ -80,16 +85,10 @@
                                 <div style="grid-column:1 / -1"><div class="id-label">Address</div><div class="id-value">{{ $address }}</div></div>
                             </div>
 
-                            {{-- Signatures: the holder's (only when uploaded) and the association's authorized signatory --}}
-                            <div style="display:flex;justify-content:center;gap:18px;text-align:center">
-                                @if ($membership->signature_url)
-                                <div style="flex:1">
-                                    <div style="height:30px;background:center bottom / contain no-repeat;background-image:url('{{ $membership->signature_url }}')"></div>
-                                    <div style="border-top:1px solid #6b7280;padding-top:2px;white-space:nowrap" class="id-label">Holder's signature</div>
-                                </div>
-                                @endif
-                                <div style="{{ $membership->signature_url ? 'flex:1' : 'width:150px' }}">
-                                    <div style="height:30px"></div>
+                            {{-- Authorized signature: one image set in Membership Settings, shared by every card --}}
+                            <div style="display:flex;justify-content:center;text-align:center">
+                                <div style="width:150px">
+                                    <div style="height:30px;{{ $siteSettings->authorized_signature_url ? "background:center bottom / contain no-repeat;background-image:url('".$siteSettings->authorized_signature_url."')" : '' }}"></div>
                                     <div style="border-top:1px solid #6b7280;padding-top:2px;white-space:nowrap" class="id-label">Authorized signature</div>
                                 </div>
                             </div>
@@ -139,7 +138,7 @@
             // Returns a data URL rendered at 4x so the file is print quality (about 1300 x 2050 px).
             // PNG keeps the rounded corners transparent; JPEG (for the PDF) is far smaller than a PNG.
             const capture = async (format = 'png') => {
-                await document.fonts.load('30px "Yatra One"', @json($siteSettings->site_name_np)).catch(() => {});
+                await document.fonts.load('24px "Yatra One"', @json($siteSettings->site_name_np)).catch(() => {});
                 await document.fonts.ready;
                 const node = document.getElementById('id-card');
                 const options = { cacheBust: true, imagePlaceholder: BLANK, fontEmbedCSS: await window.htmlToImage.getFontEmbedCSS(node) };

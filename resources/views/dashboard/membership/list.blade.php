@@ -30,6 +30,14 @@
     <div class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{{ session('dashboard-error') }}</div>
     @endif
 
+    <div class="mt-4 flex flex-col gap-1 rounded-lg bg-navy p-5 text-white shadow-md sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <div class="text-sm font-semibold uppercase tracking-wider">Total Membership Fees Collected</div>
+            <div class="text-xs">From {{ number_format($counts['approved'] ?? 0) }} approved {{ Str::plural('member', $counts['approved'] ?? 0) }}</div>
+        </div>
+        <div class="text-2xl font-extrabold sm:text-3xl">Rs. {{ number_format($totalCollected, 2) }}</div>
+    </div>
+
     <div class="mt-4 rounded-lg bg-white p-3 shadow-md sm:p-4">
         <table id="resource-table" class="display w-full text-sm" style="width:100%">
             <thead>

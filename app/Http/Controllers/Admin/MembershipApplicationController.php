@@ -43,6 +43,7 @@ class MembershipApplicationController extends Controller
             'lists' => self::LISTS,
             'counts' => Membership::query()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
             'rows' => Membership::query()->with('type')->where('status', $status)->latest('id')->get(),
+            'totalCollected' => Membership::totalCollected(),
         ]);
     }
 

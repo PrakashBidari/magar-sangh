@@ -48,9 +48,9 @@
             @endphp
             @foreach ($stats as $stat)
             <div class="px-4 py-2 {{ $stat['wide'] ?? false ? 'col-span-2 md:col-span-1' : '' }}">
-                <div class="mx-auto flex h-20 w-20 items-center justify-center text-4xl text-gold-300"><i class="{{ $stat['icon'] }}"></i></div>
-                <div class="mt-2 text-3xl font-extrabold text-gold-300">{{ $stat['value'] }}</div>
-                <div class="font-heading mt-1 text-xs uppercase tracking-wide text-gray-300">{{ $stat['label'] }}</div>
+                <div class="mx-auto flex h-20 w-20 items-center justify-center text-4xl text-white"><i class="{{ $stat['icon'] }}"></i></div>
+                <div class="mt-2 text-3xl font-extrabold text-white">{{ $stat['value'] }}</div>
+                <div class="font-heading mt-1 text-xs uppercase tracking-wide text-white">{{ $stat['label'] }}</div>
             </div>
             @endforeach
         </div>

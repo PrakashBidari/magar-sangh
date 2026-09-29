@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Membership;
 use App\Models\MembershipType;
+use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class MembershipTest extends TestCase
@@ -303,6 +305,38 @@ class MembershipTest extends TestCase
             ->assertDontSee($membership->current_address);
         $this->actingAs($admin)->get(route('dashboard.membership.card', $membership))->assertOk();
         $this->actingAs($this->member())->get(route('dashboard.membership.card', $membership))->assertForbidden();
+    }
+
+    public function test_authorized_signature_is_set_once_and_used_on_every_card(): void
+    {
+        $admin = $this->admin();
+        $cards = Membership::factory()->count(2)->create(['signature_url' => '/storage/holder-sign.png'])
+            ->each(fn (Membership $m) => $m->load('type')->approve($admin));
+
+        $this->actingAs($this->member())->get(route('dashboard.membership.settings'))->assertForbidden();
+        $this->actingAs($admin)->get(route('dashboard.membership.settings'))->assertOk()->assertSee('Authorized Signature');
+
+        $this->actingAs($admin)->put(route('dashboard.membership.settings.update'), [
+            'authorized_signature' => UploadedFile::fake()->create('notes.pdf', 10, 'application/pdf'),
+        ])->assertSessionHasErrors('authorized_signature');
+
+        $this->actingAs($admin)->put(route('dashboard.membership.settings.update'), [
+            'authorized_signature' => UploadedFile::fake()->image('sign.png'),
+        ])->assertRedirect(route('dashboard.membership.settings'));
+
+        $url = Setting::current()->authorized_signature_url;
+        $this->assertNotNull($url);
+        Storage::disk('public')->assertExists(Str::after($url, '/storage/'));
+
+        foreach ($cards as $card) {
+            $this->actingAs($admin)->get(route('dashboard.membership.card', $card))
+                ->assertOk()->assertSee($url, false)->assertSee('Central Committee')
+                ->assertDontSee("Holder's signature", false)->assertDontSee('/storage/holder-sign.png', false);
+        }
+
+        $this->actingAs($admin)->put(route('dashboard.membership.settings.update'), ['remove_signature' => '1']);
+        $this->assertNull(Setting::current()->fresh()->authorized_signature_url);
+        Storage::disk('public')->assertMissing(Str::after($url, '/storage/'));
     }
 
     public function test_vouchers_are_private_to_owner_and_admin(): void

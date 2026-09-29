@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Admin\DonationSettingController;
 use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\MembershipApplicationController;
+use App\Http\Controllers\Admin\MembershipSettingController;
 use App\Http\Controllers\Admin\ResourceController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\ArticleController;
@@ -60,7 +62,7 @@ Route::get('/membership', [MembershipController::class, 'types'])->name('members
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 Route::get('/donation-list', function () {
-    return view('donation-list');
+    return view('donation-list', ['documents' => \App\Models\DonationDocument::latest('id')->get()]);
 })->name('donation-list');
 
 Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(function () {
@@ -85,6 +87,8 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
             Route::get('/pending', 'pending')->name('pending');
             Route::get('/approved', 'approved')->name('approved');
             Route::get('/disapproved', 'rejected')->name('rejected');
+            Route::get('/settings', [MembershipSettingController::class, 'edit'])->name('settings');
+            Route::put('/settings', [MembershipSettingController::class, 'update'])->name('settings.update');
 
             Route::prefix('applications/{membership}')->whereNumber('membership')->group(function () {
                 Route::get('/', 'show')->name('show');
@@ -95,6 +99,12 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
                 Route::post('/disapprove', 'reject')->name('reject');
             });
         });
+
+        // Lakhan Thapa Pratisthan page content shown above the donation list.
+        Route::get('/donation-settings', [DonationSettingController::class, 'edit'])->name('donation-settings');
+        Route::put('/donation-settings', [DonationSettingController::class, 'update'])->name('donation-settings.update');
+        Route::post('/donation-settings/documents', [DonationSettingController::class, 'storeDocument'])->name('donation-settings.documents.store');
+        Route::delete('/donation-settings/documents/{document}', [DonationSettingController::class, 'destroyDocument'])->whereNumber('document')->name('donation-settings.documents.destroy');
 
         // Simple daily income & expense book.
         Route::resource('accounting', TransactionController::class)

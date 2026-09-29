@@ -38,7 +38,7 @@ return [
         'gallery' => 'Gallery',
         'organization' => 'Organization',
         'membership' => 'Membership',
-        'donation' => 'Donations',
+        'donation' => 'Lakhan Thapa Pratisthan',
         'accounting' => 'Accounting',
         'inbox' => 'Inbox',
         'people' => 'People',
@@ -308,11 +308,12 @@ return [
         // ---------------------------------------------------------------- Donations
         'donations' => [
             'group' => 'donation',
-            'label' => 'Lakhan Thapa Pratisthan',
+            'label' => 'Donations',
             'singular' => 'Donation',
             'icon' => '💰',
             'model' => Donation::class,
             'order' => ['donate_date', 'desc'],
+            'summary' => ['label' => 'Total Donation Collected', 'sum' => 'amount'],
             'columns' => [
                 ['field' => 'donor_image_url', 'label' => 'Photo', 'type' => 'image'],
                 ['field' => 'donor_name', 'label' => 'Donor'],
