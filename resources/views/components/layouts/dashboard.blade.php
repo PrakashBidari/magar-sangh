@@ -20,6 +20,16 @@
         ['label' => 'Approved Members', 'icon' => '✅', 'href' => route('dashboard.membership.approved'), 'active' => request()->routeIs('dashboard.membership.approved') || $viewing === 'approved', 'badge' => null],
         ['label' => 'Disapproved', 'icon' => '⛔', 'href' => route('dashboard.membership.rejected'), 'active' => request()->routeIs('dashboard.membership.rejected') || $viewing === 'rejected', 'badge' => null],
     ])->values();
+
+    // Accounting: the income & expense book, one link per view (the list page reads ?type=).
+    $bookType = request()->routeIs('dashboard.accounting.edit') ? request()->route('transaction')?->type : request()->query('type');
+    $onBook = request()->routeIs('dashboard.accounting.index', 'dashboard.accounting.edit');
+    $navItems['accounting'] = collect([
+        ['label' => 'All Entries', 'icon' => '📒', 'href' => route('dashboard.accounting.index'), 'active' => $onBook && ! in_array($bookType, ['income', 'expense'], true), 'badge' => null],
+        ['label' => 'Income', 'icon' => '💰', 'href' => route('dashboard.accounting.index', ['type' => 'income']), 'active' => $onBook && $bookType === 'income', 'badge' => null],
+        ['label' => 'Expense', 'icon' => '💸', 'href' => route('dashboard.accounting.index', ['type' => 'expense']), 'active' => $onBook && $bookType === 'expense', 'badge' => null],
+        ['label' => 'Add Entry', 'icon' => '➕', 'href' => route('dashboard.accounting.create'), 'active' => request()->routeIs('dashboard.accounting.create'), 'badge' => null],
+    ]);
 @endphp
 <!DOCTYPE html>
 <html lang="en" translate="no" class="notranslate">
@@ -29,7 +39,7 @@
     <meta name="google" content="notranslate">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title }} - Dashboard - {{ $siteSettings->site_name_en }}</title>
-    <link rel="icon" href="{{ $siteSettings->logo_url }}">
+    @if ($siteSettings->logo_url)<link rel="icon" href="{{ $siteSettings->logo_url }}">@endif
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.3/css/responsive.dataTables.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/editor.css'])
@@ -41,7 +51,9 @@
         <aside id="dashboard-sidebar" class="fixed inset-y-0 left-0 z-40 flex w-72 shrink-0 -translate-x-full transform flex-col bg-gradient-to-b from-navy-800 to-navy text-white shadow-2xl transition-transform duration-300 ease-out md:sticky md:top-0 md:h-screen md:w-64 md:translate-x-0 md:shadow-none">
             {{-- Brand --}}
             <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 border-b border-white/10 px-5 py-4">
-                <img src="{{ $siteSettings->logo_url }}" alt="Logo" class="h-11 w-11 rounded-full object-cover ring-2 ring-gold/60">
+                @if ($siteSettings->logo_url)
+                <img src="{{ $siteSettings->logo_url }}" alt="Logo" class="h-12 w-auto rounded-md bg-white object-contain p-1 ring-2 ring-gold/60">
+                @endif
                 <div class="min-w-0">
                     <div class="np truncate text-sm font-bold leading-tight">{{ $siteSettings->site_name_np }}</div>
                     <div class="text-[11px] font-semibold uppercase tracking-widest text-gold-300">Dashboard</div>

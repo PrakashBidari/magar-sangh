@@ -44,7 +44,7 @@
                             @case('image')
                                 <td>
                                     @if ($value)
-                                    <img src="{{ $value }}" alt="" loading="lazy" class="h-10 w-10 rounded object-cover">
+                                    <img src="{{ $value }}" alt="" loading="lazy" class="h-10 w-10 rounded {{ ($col['fit'] ?? 'cover') === 'contain' ? 'bg-white object-contain' : 'object-cover' }}">
                                     @else
                                     <span class="text-gray-300">—</span>
                                     @endif

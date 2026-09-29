@@ -18,13 +18,13 @@
         .id-head::before { content: ''; position: absolute; left: -30px; bottom: -60px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255, 255, 255, .07); }
         .id-gold { flex-shrink: 0; height: 5px; background: linear-gradient(90deg, #D4AF37, #f2dc8a, #D4AF37); }
         .id-org { min-width: 0; font-family: 'Yatra One', 'Noto Sans Devanagari', serif; font-size: 30px; font-weight: 400; line-height: 1.15; letter-spacing: .01em; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .35); white-space: nowrap; }
-        .id-logo { width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; background: #fff center / cover no-repeat; border: 2px solid #D4AF37; }
+        .id-logo { width: 44px; height: 52px; flex-shrink: 0; padding: 3px; border-radius: 8px; background: #fff center / contain no-repeat; background-origin: content-box; border: 2px solid #D4AF37; }
         .id-photo { flex-shrink: 0; width: 96px; height: 96px; margin: -32px auto 0; position: relative; z-index: 2; border-radius: 50%; border: 4px solid #fff; outline: 2px solid #D4AF37; background: #e5e7eb center / cover no-repeat; box-shadow: 0 6px 14px rgba(0, 0, 0, .25); }
         .id-label { font-size: 8.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; }
         .id-value { margin-top: 1px; font-size: 11.5px; font-weight: 600; color: #111827; line-height: 1.3; word-break: break-word; }
         .id-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 7px 14px; text-align: left; }
         .id-foot { flex-shrink: 0; padding: 8px 12px; background: #001F5B; color: #fff; font-size: 9.5px; line-height: 1.45; text-align: center; border-top: 3px solid #D4AF37; }
-        .id-watermark { position: absolute; left: 50%; top: 58%; width: 260px; height: 260px; transform: translate(-50%, -50%); border-radius: 50%; opacity: .06; background: center / contain no-repeat; }
+        .id-watermark { position: absolute; left: 50%; top: 58%; width: 260px; height: 300px; transform: translate(-50%, -50%); opacity: .06; background: center / contain no-repeat; }
         .id-stamp { position: absolute; left: 50%; top: 52%; z-index: 5; transform: translate(-50%, -50%) rotate(-24deg); padding: 6px 20px; border: 4px solid #dc2626; border-radius: 8px; color: #dc2626; font-size: 34px; font-weight: 900; letter-spacing: .1em; background: rgba(255, 255, 255, .55); }
     </style>
 
@@ -55,11 +55,11 @@
             <div class="id-sheet">
                 <div class="id-shadow">
                     <div class="id-card" id="id-card">
-                        <div class="id-watermark" style="background-image:url('{{ $siteSettings->logo_url }}')"></div>
+                        @if ($siteSettings->logo_url)<div class="id-watermark" style="background-image:url('{{ $siteSettings->logo_url }}')"></div>@endif
 
                         <div class="id-head">
                             <div class="relative z-10 flex items-center justify-center gap-3">
-                                <div class="id-logo" style="background-image:url('{{ $siteSettings->logo_url }}')"></div>
+                                @if ($siteSettings->logo_url)<div class="id-logo" style="background-image:url('{{ $siteSettings->logo_url }}')"></div>@endif
                                 <div class="id-org np">{{ $siteSettings->site_name_np }}</div>
                             </div>
                             <div class="relative z-10" style="margin-top:3px;text-align:center;font-size:9.5px;line-height:1.2;font-weight:800;letter-spacing:.32em;color:#f2dc8a">MEMBERSHIP CARD</div>

@@ -39,6 +39,7 @@ return [
         'organization' => 'Organization',
         'membership' => 'Membership',
         'donation' => 'Donations',
+        'accounting' => 'Accounting',
         'inbox' => 'Inbox',
         'people' => 'People',
     ],
@@ -259,7 +260,7 @@ return [
             'model' => SisterOrganization::class,
             'order' => ['sort_order', 'asc'],
             'columns' => [
-                ['field' => 'logo_url', 'label' => 'Logo', 'type' => 'image'],
+                ['field' => 'logo_url', 'label' => 'Logo', 'type' => 'image', 'fit' => 'contain'],
                 ['field' => 'name_np', 'label' => 'Name (Nepali)'],
                 ['field' => 'name_en', 'label' => 'Name (English)'],
                 ['field' => 'link', 'label' => 'Website'],

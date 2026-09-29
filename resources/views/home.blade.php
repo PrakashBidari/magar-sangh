@@ -15,10 +15,13 @@
     </section>
 
     {{-- PRESIDENT MESSAGE --}}
+    @if ($settings->president_message_np || $settings->president_name_np || $settings->president_photo_url)
     <section class="mx-auto max-w-7xl px-4 py-14">
         <div class="card grid grid-cols-1 items-center gap-8 md:grid-cols-3">
             <div class="flex justify-center md:col-span-1">
+                @if ($settings->president_photo_url)
                 <img src="{{ $settings->president_photo_url }}" alt="{{ $settings->president_name_np }}" class="h-48 w-48 rounded-full border-4 border-gold object-cover shadow-lg">
+                @endif
             </div>
             <div class="relative md:col-span-2">
                 <svg class="absolute -left-2 -top-6 h-14 w-14 text-maroon-100" fill="currentColor" viewBox="0 0 24 24"><path d="M7 7h5v5c0 3-2 5-5 5v-2c1.5 0 3-1 3-3H7V7zm9 0h5v5c0 3-2 5-5 5v-2c1.5 0 3-1 3-3h-3V7z"/></svg>
@@ -29,6 +32,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- STATS --}}
     <section class="bg-navy py-12 text-white">
@@ -148,7 +152,7 @@
                 <ul class="mt-4 space-y-3">
                     @foreach ($sisterOrganizations as $org)
                     <li class="flex items-center gap-3 text-sm text-gray-700">
-                        <img src="{{ $org->logo_url }}" alt="{{ $org->name_en }}" class="h-8 w-8 rounded-full object-cover">
+                        <img src="{{ $org->logo_url }}" alt="{{ $org->name_en }}" class="h-8 w-8 rounded bg-white object-contain">
                         {{ $org->name_en }}
                     </li>
                     @endforeach

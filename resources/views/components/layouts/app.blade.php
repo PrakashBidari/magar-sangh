@@ -7,7 +7,7 @@
     <meta name="google" content="notranslate">
     <title>{{ $title ? $title.' - ' : '' }}{{ $siteSettings->site_name_en }}</title>
     <meta name="description" content="{{ $siteSettings->about_short_en }}">
-    <link rel="icon" href="{{ $siteSettings->logo_url }}">
+    @if ($siteSettings->logo_url)<link rel="icon" href="{{ $siteSettings->logo_url }}">@endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>

@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\EditorUploadController;
 use App\Http\Controllers\Admin\MembershipApplicationController;
 use App\Http\Controllers\Admin\ResourceController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -88,6 +89,11 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
                 Route::post('/disapprove', 'reject')->name('reject');
             });
         });
+
+        // Simple daily income & expense book.
+        Route::resource('accounting', TransactionController::class)
+            ->parameters(['accounting' => 'transaction'])
+            ->except(['show']);
 
         Route::post('/editor-upload', EditorUploadController::class)->name('editor-upload');
 
