@@ -22,7 +22,9 @@
             <h2 class="text-xl font-bold text-navy">📒 {{ $title }}</h2>
             <p class="text-sm text-gray-500">{{ number_format($rows->count()) }} {{ Str::plural('entry', $rows->count()) }}{{ $hasFilters ? ' match the filter' : '' }}</p>
         </div>
+        @can('accounting.create')
         <a href="{{ route('dashboard.accounting.create', array_filter(['type' => $type])) }}" class="btn-maroon justify-center">+ Add Entry</a>
+        @endcan
     </div>
 
     {{-- Totals for the current filter --}}
@@ -141,12 +143,16 @@
                     <td class="whitespace-nowrap font-mono text-xs">{{ $row->reference_no ?: '—' }}</td>
                     <td data-order="{{ $row->amount }}" class="whitespace-nowrap text-right font-bold {{ $row->isIncome() ? 'text-green-700' : 'text-red-700' }}">{{ $row->isIncome() ? '+' : '−' }} {{ number_format((float) $row->amount, 2) }}</td>
                     <td class="whitespace-nowrap text-right">
+                        @can('accounting.edit')
                         <a href="{{ route('dashboard.accounting.edit', $row) }}" class="mr-3 text-xs font-semibold text-navy hover:underline">Edit</a>
+                        @endcan
+                        @can('accounting.delete')
                         <form method="POST" action="{{ route('dashboard.accounting.destroy', $row) }}" class="inline" onsubmit="return confirm('Delete this entry? This cannot be undone.')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-xs font-semibold text-red-600 hover:underline">Delete</button>
                         </form>
+                        @endcan
                     </td>
                 </tr>
                 @endforeach

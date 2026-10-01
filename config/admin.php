@@ -1,9 +1,18 @@
 <?php
 
+use App\Http\Controllers\Admin\AccountingCategoryController;
+use App\Http\Controllers\Admin\CommitteeMemberController;
+use App\Http\Controllers\Admin\CommitteeSubTypeController;
+use App\Http\Controllers\Admin\CommitteeTypeController;
+use App\Http\Controllers\Admin\DonationController;
 use App\Http\Controllers\Admin\MembershipTypeController;
+use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\UserController;
+use App\Models\AccountingCategory;
 use App\Models\Article;
 use App\Models\CommitteeMember;
+use App\Models\CommitteeSubType;
+use App\Models\CommitteeType;
 use App\Models\ContactMessage;
 use App\Models\Donation;
 use App\Models\Event;
@@ -14,6 +23,7 @@ use App\Models\MembershipType;
 use App\Models\News;
 use App\Models\NotificationItem;
 use App\Models\Publication;
+use App\Models\Role;
 use App\Models\SisterOrganization;
 use App\Models\User;
 
@@ -38,10 +48,33 @@ return [
         'gallery' => 'Gallery',
         'organization' => 'Organization',
         'membership' => 'Membership',
+        'sifaris' => 'Sifaris',
         'donation' => 'Lakhan Thapa Pratisthan',
         'accounting' => 'Accounting',
         'inbox' => 'Inbox',
-        'people' => 'People',
+        'access' => 'Roles & Permissions',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Permissions
+    |--------------------------------------------------------------------------
+    |
+    | Each resource below gets "{key}.view / create / edit / delete" permissions
+    | automatically (read-only ones: view / delete). The dashboard pages that are
+    | not resources are listed here. See App\Support\Permissions.
+    |
+    | The "admin" role always has every permission and cannot be changed.
+    |
+    */
+    'permission_sections' => [
+        'settings' => ['group' => 'general', 'label' => 'Site & About Settings', 'icon' => '⚙️', 'actions' => ['manage']],
+        'membership-applications' => ['group' => 'membership', 'label' => 'Membership Applications', 'icon' => '📝', 'actions' => ['view', 'edit', 'approve', 'delete']],
+        'membership-settings' => ['group' => 'membership', 'label' => 'Membership Settings', 'icon' => '⚙️', 'actions' => ['manage']],
+        'sifaris' => ['group' => 'sifaris', 'label' => 'Sifaris Requests', 'icon' => '📜', 'actions' => ['view', 'edit', 'approve', 'delete']],
+        'donation-settings' => ['group' => 'donation', 'label' => 'Donation Page Settings', 'icon' => '⚙️', 'actions' => ['manage']],
+        'accounting' => ['group' => 'accounting', 'label' => 'Income & Expense Book', 'icon' => '📒', 'actions' => ['view', 'create', 'edit', 'delete']],
+        'roles' => ['group' => 'access', 'label' => 'Roles & Permissions', 'icon' => '🛡️', 'actions' => ['view', 'create', 'edit', 'delete']],
     ],
 
     'resources' => [
@@ -78,11 +111,14 @@ return [
             'singular' => 'News',
             'icon' => '📰',
             'model' => News::class,
+            'controller' => NewsController::class,
+            'approvable' => true, // adds the "news.approve" permission and Approve / Disapprove buttons
             'order' => ['published_at', 'desc'],
             'columns' => [
                 ['field' => 'image_url', 'label' => 'Image', 'type' => 'image'],
                 ['field' => 'title', 'label' => 'Title'],
                 ['field' => 'published_at', 'label' => 'Published', 'type' => 'datetime'],
+                ['field' => 'status', 'label' => 'Status', 'type' => 'status'],
             ],
             'fields' => [
                 ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|string|max:255'],
@@ -222,24 +258,76 @@ return [
         ],
 
         // ---------------------------------------------------------------- Organization
+        'committee-types' => [
+            'group' => 'organization',
+            'label' => 'Committee Types',
+            'singular' => 'Committee Type',
+            'icon' => '🗂️',
+            'model' => CommitteeType::class,
+            'controller' => CommitteeTypeController::class,
+            'order' => ['sort_order', 'asc'],
+            'columns' => [
+                ['field' => 'name_np', 'label' => 'Name (Nepali)', 'class' => 'np'],
+                ['field' => 'name_en', 'label' => 'Name (English)'],
+                ['field' => 'members_count', 'label' => 'Members'],
+                ['field' => 'sort_order', 'label' => 'Order'],
+            ],
+            'fields' => [
+                ['name' => 'name_np', 'label' => 'Name (Nepali)', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half', 'class' => 'np'],
+                ['name' => 'name_en', 'label' => 'Name (English)', 'type' => 'text', 'rules' => 'nullable|string|max:255', 'width' => 'half'],
+                ['name' => 'sort_order', 'label' => 'Sort Order', 'type' => 'number', 'rules' => 'nullable|integer|min:0', 'width' => 'half', 'default' => 0, 'help' => 'Committees are listed on the committee page in this order.'],
+            ],
+        ],
+
+        'committee-sub-types' => [
+            'group' => 'organization',
+            'label' => 'Committee Sub Types',
+            'singular' => 'Sub Type',
+            'icon' => '🗃️',
+            'model' => CommitteeSubType::class,
+            'controller' => CommitteeSubTypeController::class,
+            'order' => ['committee_type_id', 'asc'],
+            'columns' => [
+                ['field' => 'name_np', 'label' => 'Sub Type (Nepali)', 'class' => 'np'],
+                ['field' => 'name_en', 'label' => 'Sub Type (English)'],
+                ['field' => 'committeeType.name_np', 'label' => 'Committee', 'class' => 'np'],
+                ['field' => 'members_count', 'label' => 'Members'],
+                ['field' => 'sort_order', 'label' => 'Order'],
+            ],
+            'fields' => [
+                ['name' => 'committee_type_id', 'label' => 'Committee', 'type' => 'select', 'options_from' => CommitteeType::class, 'placeholder' => '— Select committee —', 'rules' => 'required|integer|exists:committee_types,id', 'help' => 'e.g. District Committee.'],
+                ['name' => 'name_np', 'label' => 'Sub Type Name (Nepali)', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half', 'class' => 'np', 'help' => 'e.g. काठमाडौं'],
+                ['name' => 'name_en', 'label' => 'Sub Type Name (English)', 'type' => 'text', 'rules' => 'nullable|string|max:255', 'width' => 'half', 'help' => 'e.g. Kathmandu'],
+                ['name' => 'sort_order', 'label' => 'Sort Order', 'type' => 'number', 'rules' => 'nullable|integer|min:0', 'width' => 'half', 'default' => 0, 'help' => 'Tabs on the committee page follow this order.'],
+            ],
+        ],
+
         'committee' => [
             'group' => 'organization',
             'label' => 'Committee & Presidents',
             'singular' => 'Member',
             'icon' => '🏛️',
             'model' => CommitteeMember::class,
+            'controller' => CommitteeMemberController::class,
             'order' => ['sort_order', 'asc'],
             'columns' => [
                 ['field' => 'photo_url', 'label' => 'Photo', 'type' => 'image'],
                 ['field' => 'name', 'label' => 'Name'],
+                ['field' => 'phone', 'label' => 'Phone'],
                 ['field' => 'position_np', 'label' => 'Position'],
+                ['field' => 'committeeType.name_np', 'label' => 'Committee', 'class' => 'np'],
+                ['field' => 'committeeSubType.name_np', 'label' => 'Sub Type', 'class' => 'np'],
                 ['field' => 'term_label', 'label' => 'Term'],
                 ['field' => 'is_current', 'label' => 'Current', 'type' => 'boolean'],
                 ['field' => 'is_past_president', 'label' => 'Past President', 'type' => 'boolean'],
+                ['field' => 'show_on_homepage', 'label' => 'Homepage', 'type' => 'boolean'],
                 ['field' => 'sort_order', 'label' => 'Order'],
             ],
             'fields' => [
-                ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|string|max:255'],
+                ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half'],
+                ['name' => 'phone', 'label' => 'Phone Number', 'type' => 'tel', 'rules' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9][0-9\s\-]{6,18}$/'], 'width' => 'half', 'help' => 'e.g. 98XXXXXXXX. Only shown in the dashboard.'],
+                ['name' => 'committee_type_id', 'label' => 'Committee', 'type' => 'select', 'options_from' => CommitteeType::class, 'placeholder' => '— Select committee —', 'rules' => 'required|integer|exists:committee_types,id', 'help' => 'Add committees under Committee Types.', 'width' => 'half'],
+                ['name' => 'committee_sub_type_id', 'label' => 'Sub Type', 'type' => 'select', 'options_from' => CommitteeSubType::class, 'depends_on' => 'committee_type_id', 'placeholder' => '— None (whole committee) —', 'rules' => 'nullable|integer', 'help' => 'Optional, e.g. Kathmandu for the District Committee. Add them under Committee Sub Types.', 'width' => 'half'],
                 ['name' => 'photo_url', 'label' => 'Photo', 'type' => 'image', 'folder' => 'committee'],
                 ['name' => 'position_np', 'label' => 'Position (Nepali)', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half', 'class' => 'np'],
                 ['name' => 'position_en', 'label' => 'Position (English)', 'type' => 'text', 'rules' => 'nullable|string|max:255', 'width' => 'half'],
@@ -249,6 +337,7 @@ return [
                 ['name' => 'term_end', 'label' => 'Term End', 'type' => 'date', 'rules' => 'nullable|date|after_or_equal:term_start', 'width' => 'half'],
                 ['name' => 'is_current', 'label' => 'Part of the current committee', 'type' => 'checkbox'],
                 ['name' => 'is_past_president', 'label' => 'Is a past president', 'type' => 'checkbox'],
+                ['name' => 'show_on_homepage', 'label' => 'Show on the homepage', 'type' => 'checkbox', 'default' => false],
             ],
         ],
 
@@ -312,21 +401,55 @@ return [
             'singular' => 'Donation',
             'icon' => '💰',
             'model' => Donation::class,
+            'controller' => DonationController::class,
+            // Members add donations from "My Donations"; admins approve them or return them with a note.
+            'approvable' => true,
+            'reject_label' => 'Return',
+            'rejected_label' => 'Returned',
+            'reject_reason' => true,
             'order' => ['donate_date', 'desc'],
-            'summary' => ['label' => 'Total Donation Collected', 'sum' => 'amount'],
+            'summary' => ['label' => 'Total Donation Collected', 'sum' => 'amount', 'scope' => 'approved'],
             'columns' => [
                 ['field' => 'donor_image_url', 'label' => 'Photo', 'type' => 'image'],
                 ['field' => 'donor_name', 'label' => 'Donor'],
                 ['field' => 'amount', 'label' => 'Amount', 'type' => 'money'],
                 ['field' => 'address', 'label' => 'Address'],
                 ['field' => 'donate_date', 'label' => 'Date', 'type' => 'date'],
+                ['field' => 'voucher_url', 'label' => 'Voucher', 'type' => 'image', 'link' => true],
+                ['field' => 'user.name', 'label' => 'Added By'],
+                ['field' => 'status', 'label' => 'Status', 'type' => 'status'],
             ],
             'fields' => [
                 ['name' => 'donor_name', 'label' => 'Donor Name', 'type' => 'text', 'rules' => 'required|string|max:255', 'width' => 'half'],
                 ['name' => 'amount', 'label' => 'Amount (Rs.)', 'type' => 'number', 'rules' => 'required|numeric|min:1', 'width' => 'half', 'step' => '0.01'],
                 ['name' => 'address', 'label' => 'Address', 'type' => 'text', 'rules' => 'nullable|string|max:255', 'width' => 'half'],
                 ['name' => 'donate_date', 'label' => 'Donation Date', 'type' => 'date', 'rules' => 'required|date', 'width' => 'half', 'default' => 'today'],
-                ['name' => 'donor_image_url', 'label' => 'Donor Photo', 'type' => 'image', 'folder' => 'donations'],
+                ['name' => 'donor_image_url', 'label' => 'Donor Photo', 'type' => 'image', 'folder' => 'donations', 'width' => 'half'],
+                // Required when a member adds a donation (see MyDonationController).
+                ['name' => 'voucher_url', 'label' => 'Paid Bank Voucher', 'type' => 'image', 'folder' => 'donation-vouchers', 'max' => 6144, 'width' => 'half', 'help' => 'Photo or scan of the bank deposit voucher / payment receipt.'],
+            ],
+        ],
+
+        // ---------------------------------------------------------------- Accounting
+        'accounting-categories' => [
+            'group' => 'accounting',
+            'label' => 'Entry Categories',
+            'singular' => 'Category',
+            'icon' => '🏷️',
+            'model' => AccountingCategory::class,
+            'controller' => AccountingCategoryController::class,
+            'order' => ['sort_order', 'asc'],
+            'columns' => [
+                ['field' => 'name', 'label' => 'Category'],
+                ['field' => 'type', 'label' => 'Type', 'class' => 'capitalize'],
+                ['field' => 'sort_order', 'label' => 'Order'],
+                ['field' => 'is_active', 'label' => 'Active', 'type' => 'boolean'],
+            ],
+            'fields' => [
+                ['name' => 'name', 'label' => 'Category Name', 'type' => 'text', 'rules' => 'required|string|max:100', 'width' => 'half'],
+                ['name' => 'type', 'label' => 'Type', 'type' => 'select', 'rules' => 'required|in:income,expense', 'width' => 'half', 'options' => ['income' => 'Income', 'expense' => 'Expense'], 'default' => 'income'],
+                ['name' => 'sort_order', 'label' => 'Display Order', 'type' => 'number', 'rules' => 'nullable|integer|min:0', 'width' => 'half', 'default' => 0, 'help' => 'Smaller numbers are listed first.'],
+                ['name' => 'is_active', 'label' => 'Active (shown when adding an entry)', 'type' => 'checkbox', 'default' => true],
             ],
         ],
 
@@ -357,7 +480,7 @@ return [
 
         // ---------------------------------------------------------------- Users
         'users' => [
-            'group' => 'people',
+            'group' => 'access',
             'label' => 'Users',
             'singular' => 'User',
             'icon' => '👥',
@@ -373,7 +496,7 @@ return [
             'fields' => [
                 ['name' => 'name', 'label' => 'Full Name', 'type' => 'text', 'width' => 'half'],
                 ['name' => 'email', 'label' => 'Email', 'type' => 'text', 'width' => 'half'],
-                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options' => ['admin' => 'Admin', 'user' => 'User'], 'width' => 'half', 'default' => 'user'],
+                ['name' => 'role', 'label' => 'Role', 'type' => 'select', 'options_from' => Role::class, 'width' => 'half', 'default' => 'user', 'help' => 'Choose what this person may do. Manage roles under Roles & Permissions.'],
                 ['name' => 'password', 'label' => 'Password', 'type' => 'password', 'width' => 'half', 'help' => 'Leave blank to keep the current password.'],
             ],
         ],

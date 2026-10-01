@@ -19,12 +19,11 @@ class HomeController extends Controller
 
         $heroSlides = HeroSlide::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
 
-        $pastPresidents = CommitteeMember::where('is_past_president', true)
+        $homepageMembers = CommitteeMember::where('show_on_homepage', true)
             ->orderBy('sort_order')
-            ->take(7)
             ->get();
 
-        $latestNews = News::orderByDesc('published_at')->take(4)->get();
+        $latestNews = News::approved()->orderByDesc('published_at')->take(4)->get();
         $upcomingEvent = Event::where('event_date', '>=', now()->subDay())->orderBy('event_date')->first()
             ?? Event::orderByDesc('event_date')->first();
         $photos = GalleryPhoto::orderByDesc('id')->take(6)->get();
@@ -32,7 +31,7 @@ class HomeController extends Controller
         $sisterOrganizations = SisterOrganization::orderBy('sort_order')->get();
 
         return view('home', compact(
-            'settings', 'heroSlides', 'pastPresidents', 'latestNews', 'upcomingEvent', 'photos', 'videos', 'sisterOrganizations'
+            'settings', 'heroSlides', 'homepageMembers', 'latestNews', 'upcomingEvent', 'photos', 'videos', 'sisterOrganizations'
         ));
     }
 }

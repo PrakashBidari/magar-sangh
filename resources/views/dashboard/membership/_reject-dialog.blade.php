@@ -5,7 +5,7 @@
         <h3 class="text-lg font-bold text-navy">Disapprove application</h3>
         <p class="mt-1 text-sm text-gray-600">You are disapproving <strong id="reject-name"></strong>. The reason is shown to the applicant.</p>
         <label for="reject-reason" class="mt-4 block text-sm font-semibold text-gray-700">Reason <span class="font-normal text-gray-400">(optional)</span></label>
-        <textarea id="reject-reason" name="reason" rows="3" maxlength="500" class="mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon" placeholder="e.g. Payment voucher is not readable."></textarea>
+        <textarea id="reject-reason" name="reason" rows="3" maxlength="500" class="mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon" placeholder="e.g. The photo is not clear."></textarea>
         <div class="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button type="button" id="reject-cancel" class="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancel</button>
             <button type="submit" class="rounded-md bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Disapprove</button>

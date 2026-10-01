@@ -46,6 +46,8 @@ new class extends Component
 
     public function mount(): void
     {
+        abort_unless(auth()->user()?->can('settings.manage'), 403);
+
         // Nullable columns come back as null, but the typed properties above expect strings / ints.
         foreach (Setting::current()->only($this->fillableKeys()) as $key => $value) {
             $this->{$key} = $value ?? (str_starts_with($key, 'stat_') ? 0 : '');
@@ -121,6 +123,9 @@ new class extends Component
 
     public function save(): void
     {
+        // Livewire calls this through its own endpoint, so check again here.
+        abort_unless(auth()->user()?->can('settings.manage'), 403);
+
         try {
             $this->validate();
         } catch (ValidationException $e) {

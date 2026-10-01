@@ -89,7 +89,7 @@ class MembershipController extends Controller
 
     private function authorizeAccess(Request $request, Membership $membership): void
     {
-        abort_unless($membership->user_id === $request->user()->id || $request->user()->hasRole('admin'), 403);
+        abort_unless($membership->user_id === $request->user()->id || $request->user()->can('membership-applications.view'), 403);
     }
 
     private function canApply(Request $request): bool

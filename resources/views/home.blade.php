@@ -56,7 +56,8 @@
         </div>
     </section>
 
-    {{-- CENTRAL COMMITTEE / PAST PRESIDENTS --}}
+    {{-- CENTRAL COMMITTEE / PAST PRESIDENTS (members marked "Show on the homepage") --}}
+    @if ($homepageMembers->isNotEmpty())
     <section class="mx-auto max-w-7xl px-4 py-14">
         <div class="text-center">
             <h2 class="section-title-np">नेपाल मगर संघ केन्द्रीय समिति</h2>
@@ -65,12 +66,12 @@
 
         <div class="swiper presidents-swiper mt-10">
             <div class="swiper-wrapper">
-                @foreach ($pastPresidents as $president)
+                @foreach ($homepageMembers as $member)
                 <div class="swiper-slide">
                     <div class="card flex h-full flex-col items-center text-center">
-                        <img src="{{ $president->photo_url }}" alt="{{ $president->name }}" class="h-24 w-24 rounded-full object-cover shadow glightbox-img" data-gallery="presidents">
-                        <div class="np mt-3 font-bold text-navy">{{ $president->name }}</div>
-                        <div class="np text-sm text-maroon">{{ $president->term_label }}</div>
+                        <img src="{{ $member->photo_url }}" alt="{{ $member->name }}" class="h-24 w-24 rounded-full object-cover shadow glightbox-img" data-gallery="presidents">
+                        <div class="np mt-3 font-bold text-navy">{{ $member->name }}</div>
+                        <div class="np text-sm text-maroon">{{ $member->is_past_president ? $member->term_label : $member->position_np }}</div>
                     </div>
                 </div>
                 @endforeach
@@ -79,10 +80,11 @@
 
         <div class="mt-10 text-center">
             <a href="{{ route('about.committee') }}" class="np inline-flex items-center gap-2 font-semibold text-maroon hover:underline">
-                सबै पूर्व अध्यक्षहरू हेर्नुहोस् →
+                सबै समिति सदस्यहरू हेर्नुहोस् →
             </a>
         </div>
     </section>
+    @endif
 
     {{-- FOUR COLUMN INFO GRID --}}
     <section class="bg-navy-50 py-14">

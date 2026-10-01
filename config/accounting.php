@@ -5,9 +5,10 @@
 | Accounting lists
 |--------------------------------------------------------------------------
 |
-| Choices offered on the income / expense form and the filter checkboxes.
-| Values are stored as plain text, so entries keep their category even if a
-| name is later removed from these lists.
+| Categories are managed in the dashboard (Accounting → Entry Categories);
+| the lists below are only the starting set copied into the database when
+| the accounting_categories table is created, and are used by the factory.
+| Payment methods are offered on the income / expense form and the filters.
 |
 */
 

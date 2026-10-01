@@ -57,6 +57,23 @@ class MembershipTest extends TestCase
         ], $overrides);
     }
 
+    public function test_ward_number_accepts_leading_zero_and_decimals_as_typed(): void
+    {
+        $type = MembershipType::factory()->create();
+
+        foreach (['01', '1.5', '35'] as $ward) {
+            Membership::query()->delete();
+            $this->actingAs($this->member())->post(route('dashboard.my-membership.store'), $this->payload($type, ['ward_no' => $ward]))
+                ->assertSessionHasNoErrors();
+            $this->assertSame($ward, Membership::firstOrFail()->ward_no, "ward {$ward} must be stored exactly as typed");
+        }
+
+        foreach (['0', '00', '36', 'abc', '1.', '-1', '1.555'] as $ward) {
+            $this->actingAs($this->member())->post(route('dashboard.my-membership.store'), $this->payload($type, ['ward_no' => $ward]))
+                ->assertSessionHasErrors('ward_no');
+        }
+    }
+
     public function test_guests_cannot_reach_membership_pages(): void
     {
         $this->get(route('dashboard.my-membership.create'))->assertRedirect(route('login'));

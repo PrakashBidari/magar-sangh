@@ -10,35 +10,39 @@
         </div>
     </div>
 
-    @role('admin')
+    @can('access-admin')
+    @if ($money)
     <h2 class="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500">Money collected</h2>
     <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         @foreach ($money as $item)
-        <a href="{{ $item['route'] }}" class="card border-t-4 border-navy transition hover:shadow-lg">
+        <a href="{{ $item['url'] }}" class="card border-t-4 border-navy transition hover:shadow-lg">
             <div class="flex items-center gap-2 text-xs font-semibold uppercase text-gray-400"><span>{{ $item['icon'] }}</span> {{ $item['label'] }}</div>
             <div class="mt-2 text-xl font-extrabold sm:text-2xl {{ ($item['negative'] ?? false) || $item['value'] < 0 ? 'text-red-600' : 'text-navy' }}">Rs. {{ number_format($item['value'], 2) }}</div>
         </a>
         @endforeach
     </div>
+    @endif
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($stats as $stat)
-        <a href="{{ route($stat['route']) }}" class="card transition hover:shadow-lg">
+        <a href="{{ $stat['url'] }}" class="card transition hover:shadow-lg">
             <div class="text-xs font-semibold uppercase text-gray-400">{{ $stat['label'] }}</div>
             <div class="mt-2 text-2xl font-extrabold sm:text-3xl {{ ($stat['accent'] ?? false) ? 'text-maroon' : 'text-navy' }}">{{ $stat['value'] }}</div>
         </a>
         @endforeach
     </div>
 
+    @if ($quickAdd)
     <h2 class="mb-3 mt-8 text-sm font-bold uppercase tracking-wider text-gray-500">Quick add</h2>
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        @foreach (['news', 'articles', 'events', 'notifications', 'publications', 'gallery-photos', 'gallery-videos', 'committee', 'sister-organizations', 'donations'] as $key)
+        @foreach ($quickAdd as $key)
         <a href="{{ route('dashboard.'.$key.'.create') }}" class="card flex items-center gap-2 p-4 text-sm font-semibold text-navy transition hover:shadow-lg">
             <span>{{ config('admin.resources.'.$key.'.icon') }}</span>
             <span class="truncate">+ {{ config('admin.resources.'.$key.'.singular') }}</span>
         </a>
         @endforeach
     </div>
+    @endif
     @else
     <div class="card">
         @if ($membership?->isActive())
@@ -55,5 +59,5 @@
             <a href="{{ route('dashboard.my-membership.show') }}" class="btn-maroon mt-4 !px-5 !py-2.5 text-sm">{{ $membership ? 'View my membership' : 'Apply for membership' }}</a>
         @endif
     </div>
-    @endrole
+    @endcan
 </x-layouts.dashboard>

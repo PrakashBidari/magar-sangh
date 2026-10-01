@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccountingCategory;
 use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -108,7 +109,7 @@ class TransactionController extends Controller
     {
         return view('dashboard.accounting.form', [
             'transaction' => $transaction,
-            'categories' => config('accounting.categories'),
+            'categories' => AccountingCategory::grouped(),
             'methods' => $this->methodOptions($transaction->payment_method),
         ]);
     }
@@ -116,8 +117,8 @@ class TransactionController extends Controller
     private function validated(Request $request, ?Transaction $existing = null): array
     {
         $type = $request->input('type');
-        // An entry may keep a category that was later removed from the config lists.
-        $allowed = array_merge(config('accounting.categories.'.$type, []), array_filter([$existing?->category]));
+        // An entry may keep a category that was later deactivated or deleted.
+        $allowed = array_merge(AccountingCategory::grouped()[$type] ?? [], array_filter([$existing?->category]));
 
         return $request->validate([
             'date' => ['required', 'date'],
@@ -141,10 +142,10 @@ class TransactionController extends Controller
         ])));
     }
 
-    /** Category checkboxes for the filter: config lists plus any category already used in the book. */
+    /** Category checkboxes for the filter: the Entry Categories plus any category already used in the book. */
     private function categoryOptions(?string $type): array
     {
-        $configured = $type ? config('accounting.categories.'.$type) : array_merge(...array_values(config('accounting.categories')));
+        $configured = AccountingCategory::query()->when($type, fn ($q) => $q->where('type', $type))->orderBy('sort_order')->orderBy('name')->pluck('name')->all();
         $used = Transaction::query()->when($type, fn ($q) => $q->where('type', $type))->distinct()->pluck('category')->all();
 
         return array_values(array_unique([...$configured, ...$used]));

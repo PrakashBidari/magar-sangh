@@ -1,8 +1,5 @@
 @php
     $editing = (bool) $model;
-    $action = $editing
-        ? route('dashboard.'.$key.'.update', $model->getKey())
-        : route('dashboard.'.$key.'.store');
     $title = ($editing ? 'Edit ' : 'Add ').$cfg['singular'];
     $input = 'mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon';
 @endphp
@@ -10,8 +7,12 @@
     <div class="mx-auto max-w-4xl">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
             <h2 class="text-xl font-bold text-navy">{{ $cfg['icon'] }} {{ $title }}</h2>
-            <a href="{{ route('dashboard.'.$key.'.index') }}" class="text-sm font-semibold text-maroon hover:underline">← Back to {{ $cfg['label'] }}</a>
+            <a href="{{ $listUrl }}" class="text-sm font-semibold text-maroon hover:underline">← Back to {{ $cfg['label'] }}</a>
         </div>
+
+        @if (! empty($notice))
+        <div class="mb-4 rounded-md border-l-4 border-orange-400 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">{{ $notice }}</div>
+        @endif
 
         @if ($errors->any())
         <div class="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -40,7 +41,7 @@
                     @if ($type !== 'checkbox')
                     <label for="f-{{ $name }}" class="text-sm font-semibold text-gray-700">
                         {{ $field['label'] }}
-                        @if (str_contains($field['rules'] ?? '', 'required') || (($field['required_on_create'] ?? false) && ! $editing)) <span class="text-red-500">*</span> @endif
+                        @if (in_array('required', (array) (is_array($field['rules'] ?? null) ? $field['rules'] : explode('|', $field['rules'] ?? '')), true) || (($field['required_on_create'] ?? false) && ! $editing)) <span class="text-red-500">*</span> @endif
                     </label>
                     @endif
 
@@ -56,9 +57,12 @@
                             @break
 
                         @case('select')
-                            <select id="f-{{ $name }}" name="{{ $name }}" class="{{ $input }}">
+                            <select id="f-{{ $name }}" name="{{ $name }}" class="{{ $input }}" @isset($field['depends_on']) data-depends-on="f-{{ $field['depends_on'] }}" @endisset>
+                                @isset($field['placeholder'])
+                                <option value="">{{ $field['placeholder'] }}</option>
+                                @endisset
                                 @foreach ($field['options'] as $optValue => $optLabel)
-                                <option value="{{ $optValue }}" @selected((string) $value === (string) $optValue)>{{ $optLabel }}</option>
+                                <option value="{{ $optValue }}" @selected((string) $value === (string) $optValue) @isset($field['option_parents'][$optValue]) data-parent="{{ $field['option_parents'][$optValue] }}" @endisset>{{ $optLabel }}</option>
                                 @endforeach
                             </select>
                             @break
@@ -127,8 +131,8 @@
             @endforeach
 
             <div class="flex flex-col-reverse gap-3 border-t pt-5 sm:col-span-2 sm:flex-row sm:justify-end">
-                <a href="{{ route('dashboard.'.$key.'.index') }}" class="rounded-md border border-gray-300 px-6 py-3 text-center text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancel</a>
-                <button type="submit" id="resource-submit" class="btn-maroon justify-center">{{ $editing ? 'Save Changes' : 'Create '.$cfg['singular'] }}</button>
+                <a href="{{ $listUrl }}" class="rounded-md border border-gray-300 px-6 py-3 text-center text-sm font-semibold text-gray-600 hover:bg-gray-50">Cancel</a>
+                <button type="submit" id="resource-submit" class="btn-maroon justify-center">{{ $submitLabel ?? ($editing ? 'Save Changes' : 'Create '.$cfg['singular']) }}</button>
             </div>
         </form>
     </div>
@@ -154,6 +158,26 @@
                     preview.src = URL.createObjectURL(file);
                     preview.classList.remove('hidden');
                 });
+            });
+
+            // Dependent selects: only show options that belong to the value chosen in the parent select.
+            form.querySelectorAll('select[data-depends-on]').forEach((select) => {
+                const parent = document.getElementById(select.dataset.dependsOn);
+                if (!parent) return;
+                const options = [...select.options].filter((option) => option.dataset.parent !== undefined);
+
+                const sync = () => {
+                    options.forEach((option) => {
+                        const match = option.dataset.parent === parent.value;
+                        option.hidden = !match;
+                        option.disabled = !match;
+                    });
+                    if (select.selectedOptions[0]?.disabled) select.value = '';
+                    select.disabled = parent.value === '' || options.every((option) => option.disabled);
+                };
+
+                parent.addEventListener('change', sync);
+                sync();
             });
 
             form.addEventListener('submit', () => {

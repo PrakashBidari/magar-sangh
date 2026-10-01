@@ -17,7 +17,7 @@ class ArticleController extends Controller
     public function show(Article $article)
     {
         $related = Article::where('id', '!=', $article->id)->orderByDesc('published_at')->take(3)->get();
-        $recentNews = News::orderByDesc('published_at')->take(5)->get();
+        $recentNews = News::approved()->orderByDesc('published_at')->take(5)->get();
 
         return view('media.articles.show', compact('article', 'related', 'recentNews'));
     }

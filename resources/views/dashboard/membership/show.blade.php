@@ -53,6 +53,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2 sm:w-44 sm:flex-col">
+                @can('membership-applications.approve')
                 @unless ($membership->isApproved())
                 <form method="POST" action="{{ route('dashboard.membership.approve', $membership) }}" class="flex-1">
                     @csrf
@@ -62,15 +63,20 @@
                 @unless ($membership->isRejected())
                 <button type="button" data-reject="{{ route('dashboard.membership.reject', $membership) }}" data-name="{{ $membership->displayName() }}" class="flex-1 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-600">✖ Disapprove</button>
                 @endunless
+                @endcan
                 @if ($membership->isApproved())
                 <a href="{{ route('dashboard.membership.card', $membership) }}" class="flex-1 rounded-md bg-navy px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-navy-600">🎫 ID Card</a>
                 @endif
+                @can('membership-applications.edit')
                 <a href="{{ route('dashboard.membership.edit', $membership) }}" class="flex-1 rounded-md border border-gray-300 px-4 py-2.5 text-center text-sm font-semibold text-navy hover:bg-gray-50">Edit</a>
+                @endcan
+                @can('membership-applications.delete')
                 <form method="POST" action="{{ route('dashboard.membership.destroy', $membership) }}" class="flex-1" onsubmit="return confirm('Delete this application permanently? This cannot be undone.')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="w-full rounded-md border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50">Delete</button>
                 </form>
+                @endcan
             </div>
         </div>
 

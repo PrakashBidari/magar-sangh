@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             MembershipTypeSeeder::class,
             HeroSlideSeeder::class,
+            CommitteeTypeSeeder::class,
             CommitteeMemberSeeder::class,
             NewsSeeder::class,
             ArticleSeeder::class,

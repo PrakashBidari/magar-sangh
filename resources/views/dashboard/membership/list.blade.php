@@ -10,7 +10,9 @@
             <h2 class="text-xl font-bold text-navy">{{ $meta['icon'] }} {{ $meta['title'] }}</h2>
             <p class="text-sm text-gray-500">{{ number_format($rows->count()) }} {{ Str::plural('record', $rows->count()) }}</p>
         </div>
+        @can('membership-types.view')
         <a href="{{ route('dashboard.membership-types.index') }}" class="rounded-md border border-gray-300 bg-white px-4 py-2 text-center text-sm font-semibold text-navy hover:bg-gray-50">🏷️ Membership Types</a>
+        @endcan
     </div>
 
     {{-- Pending / Approved / Disapproved tabs --}}
@@ -76,10 +78,13 @@
                     @endif
                     <td class="whitespace-nowrap text-right">
                         <a href="{{ route('dashboard.membership.show', $row) }}" class="mr-2 text-xs font-semibold text-navy hover:underline">View</a>
+                        @can('membership-applications.edit')
                         <a href="{{ route('dashboard.membership.edit', $row) }}" class="mr-2 text-xs font-semibold text-navy hover:underline">Edit</a>
+                        @endcan
                         @if ($isApproved)
                         <a href="{{ route('dashboard.membership.card', $row) }}" class="mr-2 text-xs font-semibold text-maroon hover:underline">ID Card</a>
                         @endif
+                        @can('membership-applications.approve')
                         @unless ($isApproved)
                         <form method="POST" action="{{ route('dashboard.membership.approve', $row) }}" class="inline">
                             @csrf
@@ -89,11 +94,14 @@
                         @unless ($isRejected)
                         <button type="button" data-reject="{{ route('dashboard.membership.reject', $row) }}" data-name="{{ $row->displayName() }}" class="mr-2 text-xs font-semibold text-amber-700 hover:underline">Disapprove</button>
                         @endunless
+                        @endcan
+                        @can('membership-applications.delete')
                         <form method="POST" action="{{ route('dashboard.membership.destroy', $row) }}" class="inline" onsubmit="return confirm('Delete this application permanently? This cannot be undone.')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-xs font-semibold text-red-600 hover:underline">Delete</button>
                         </form>
+                        @endcan
                     </td>
                 </tr>
                 @endforeach

@@ -4,38 +4,71 @@
     $resources = collect(config('admin.resources'))->map(fn ($r, $k) => $r + ['key' => $k])->groupBy('group');
 
     // Sidebar entries per group: config resources plus the hand-built membership pages.
+    $me = auth()->user();
+
+    // Every entry names the permission it needs ('can'); entries the user lacks are dropped below.
     $navItems = $resources->map(fn ($items) => $items->map(fn ($r) => [
         'label' => $r['label'],
         'icon' => $r['icon'],
         'href' => route('dashboard.'.$r['key'].'.index'),
         'active' => request()->routeIs('dashboard.'.$r['key'].'.*'),
-        'badge' => null,
+        // Sections that need approval show how many entries are waiting.
+        'badge' => ($r['approvable'] ?? false) && $me->can($r['key'].'.approve') ? ($r['model']::where('status', 'pending')->count() ?: null) : null,
+        'can' => $r['key'].'.view',
     ])->values());
+
+    // "My Donations" dropdown, open to every signed-in user.
+    $myDonationsOpen = request()->routeIs('dashboard.my-donations.*');
+    $myReturned = \App\Models\Donation::whereBelongsTo($me)->where('status', 'returned')->count();
+    $myDonationLinks = [
+        ['label' => 'Add Donation', 'icon' => '➕', 'href' => route('dashboard.my-donations.create'), 'active' => request()->routeIs('dashboard.my-donations.create'), 'badge' => null],
+        ['label' => 'View & Edit Donations', 'icon' => '📋', 'href' => route('dashboard.my-donations.index'), 'active' => request()->routeIs('dashboard.my-donations.index', 'dashboard.my-donations.show', 'dashboard.my-donations.edit'), 'badge' => $myReturned ?: null],
+    ];
 
     // Application detail / edit pages highlight the list the application belongs to.
     $viewing = request()->routeIs('dashboard.membership.show', 'dashboard.membership.edit') ? request()->route('membership')?->status : null;
-    $pendingCount = auth()->user()->hasRole('admin') ? \App\Models\Membership::where('status', 'pending')->count() : 0;
+    $pendingCount = $me->can('membership-applications.view') ? \App\Models\Membership::where('status', 'pending')->count() : 0;
     $navItems['membership'] = collect($navItems['membership'] ?? [])->merge([
-        ['label' => 'Pending Applications', 'icon' => '⏳', 'href' => route('dashboard.membership.pending'), 'active' => request()->routeIs('dashboard.membership.pending') || $viewing === 'pending', 'badge' => $pendingCount ?: null],
-        ['label' => 'Approved Members', 'icon' => '✅', 'href' => route('dashboard.membership.approved'), 'active' => request()->routeIs('dashboard.membership.approved') || $viewing === 'approved', 'badge' => null],
-        ['label' => 'Disapproved', 'icon' => '⛔', 'href' => route('dashboard.membership.rejected'), 'active' => request()->routeIs('dashboard.membership.rejected') || $viewing === 'rejected', 'badge' => null],
-        ['label' => 'Membership Settings', 'icon' => '⚙️', 'href' => route('dashboard.membership.settings'), 'active' => request()->routeIs('dashboard.membership.settings'), 'badge' => null],
+        ['label' => 'Pending Applications', 'icon' => '⏳', 'href' => route('dashboard.membership.pending'), 'active' => request()->routeIs('dashboard.membership.pending') || $viewing === 'pending', 'badge' => $pendingCount ?: null, 'can' => 'membership-applications.view'],
+        ['label' => 'Approved Members', 'icon' => '✅', 'href' => route('dashboard.membership.approved'), 'active' => request()->routeIs('dashboard.membership.approved') || $viewing === 'approved', 'badge' => null, 'can' => 'membership-applications.view'],
+        ['label' => 'Disapproved', 'icon' => '⛔', 'href' => route('dashboard.membership.rejected'), 'active' => request()->routeIs('dashboard.membership.rejected') || $viewing === 'rejected', 'badge' => null, 'can' => 'membership-applications.view'],
+        ['label' => 'Membership Settings', 'icon' => '⚙️', 'href' => route('dashboard.membership.settings'), 'active' => request()->routeIs('dashboard.membership.settings'), 'badge' => null, 'can' => 'membership-settings.manage'],
     ])->values();
+
+    // Sifaris requests, one link per status (detail pages highlight the list they belong to).
+    $viewingSifaris = request()->routeIs('dashboard.sifaris.show', 'dashboard.sifaris.edit', 'dashboard.sifaris.letter') ? request()->route('sifaris')?->status : null;
+    $pendingSifaris = $me->can('sifaris.view') ? \App\Models\SifarisRequest::where('status', 'pending')->count() : 0;
+    $navItems['sifaris'] = collect([
+        ['label' => 'Pending Sifaris', 'icon' => '⏳', 'href' => route('dashboard.sifaris.pending'), 'active' => request()->routeIs('dashboard.sifaris.pending') || $viewingSifaris === 'pending', 'badge' => $pendingSifaris ?: null, 'can' => 'sifaris.view'],
+        ['label' => 'Approved Sifaris', 'icon' => '✅', 'href' => route('dashboard.sifaris.approved'), 'active' => request()->routeIs('dashboard.sifaris.approved') || $viewingSifaris === 'approved', 'badge' => null, 'can' => 'sifaris.view'],
+        ['label' => 'Disapproved', 'icon' => '⛔', 'href' => route('dashboard.sifaris.rejected'), 'active' => request()->routeIs('dashboard.sifaris.rejected') || $viewingSifaris === 'rejected', 'badge' => null, 'can' => 'sifaris.view'],
+    ]);
 
     // Lakhan Thapa Pratisthan: the donation list plus the page content settings.
     $navItems['donation'] = collect($navItems['donation'] ?? [])->push(
-        ['label' => 'Settings', 'icon' => '⚙️', 'href' => route('dashboard.donation-settings'), 'active' => request()->routeIs('dashboard.donation-settings'), 'badge' => null],
+        ['label' => 'Settings', 'icon' => '⚙️', 'href' => route('dashboard.donation-settings'), 'active' => request()->routeIs('dashboard.donation-settings'), 'badge' => null, 'can' => 'donation-settings.manage'],
     );
 
     // Accounting: the income & expense book, one link per view (the list page reads ?type=).
     $bookType = request()->routeIs('dashboard.accounting.edit') ? request()->route('transaction')?->type : request()->query('type');
     $onBook = request()->routeIs('dashboard.accounting.index', 'dashboard.accounting.edit');
     $navItems['accounting'] = collect([
-        ['label' => 'All Entries', 'icon' => '📒', 'href' => route('dashboard.accounting.index'), 'active' => $onBook && ! in_array($bookType, ['income', 'expense'], true), 'badge' => null],
-        ['label' => 'Income', 'icon' => '💰', 'href' => route('dashboard.accounting.index', ['type' => 'income']), 'active' => $onBook && $bookType === 'income', 'badge' => null],
-        ['label' => 'Expense', 'icon' => '💸', 'href' => route('dashboard.accounting.index', ['type' => 'expense']), 'active' => $onBook && $bookType === 'expense', 'badge' => null],
-        ['label' => 'Add Entry', 'icon' => '➕', 'href' => route('dashboard.accounting.create'), 'active' => request()->routeIs('dashboard.accounting.create'), 'badge' => null],
-    ]);
+        ['label' => 'All Entries', 'icon' => '📒', 'href' => route('dashboard.accounting.index'), 'active' => $onBook && ! in_array($bookType, ['income', 'expense'], true), 'badge' => null, 'can' => 'accounting.view'],
+        ['label' => 'Income', 'icon' => '💰', 'href' => route('dashboard.accounting.index', ['type' => 'income']), 'active' => $onBook && $bookType === 'income', 'badge' => null, 'can' => 'accounting.view'],
+        ['label' => 'Expense', 'icon' => '💸', 'href' => route('dashboard.accounting.index', ['type' => 'expense']), 'active' => $onBook && $bookType === 'expense', 'badge' => null, 'can' => 'accounting.view'],
+        ['label' => 'Add Entry', 'icon' => '➕', 'href' => route('dashboard.accounting.create'), 'active' => request()->routeIs('dashboard.accounting.create'), 'badge' => null, 'can' => 'accounting.create'],
+    ])->merge($navItems['accounting'] ?? []); // then Entry Categories (from config)
+
+    // Roles & Permissions: roles, the all-roles matrix, then users (from config).
+    $navItems['access'] = collect([
+        ['label' => 'All Roles', 'icon' => '🛡️', 'href' => route('dashboard.roles.index'), 'active' => request()->routeIs('dashboard.roles.index', 'dashboard.roles.edit'), 'badge' => null, 'can' => 'roles.view'],
+        ['label' => 'Add Role', 'icon' => '➕', 'href' => route('dashboard.roles.create'), 'active' => request()->routeIs('dashboard.roles.create'), 'badge' => null, 'can' => 'roles.create'],
+        ['label' => 'Permission Matrix', 'icon' => '🔑', 'href' => route('dashboard.permissions.index'), 'active' => request()->routeIs('dashboard.permissions.*'), 'badge' => null, 'can' => 'roles.view'],
+    ])->merge($navItems['access'] ?? []);
+
+    $navItems = $navItems
+        ->map(fn ($items) => $items->filter(fn ($item) => $me->can($item['can']))->values())
+        ->filter(fn ($items) => $items->isNotEmpty());
 @endphp
 <!DOCTYPE html>
 <html lang="en" translate="no" class="notranslate">
@@ -77,12 +110,45 @@
                     <span class="dash-icon">🎫</span> <span class="flex-1">My Membership</span>
                 </a>
 
-                @role('admin')
+                @php $mySifarisActive = request()->routeIs('dashboard.my-sifaris.*') || (request()->routeIs('dashboard.sifaris.letter') && request()->route('sifaris')?->user_id === $me->id); @endphp
+                <a href="{{ route('dashboard.my-sifaris.index') }}" class="dash-link {{ $mySifarisActive ? 'is-active' : '' }}">
+                    <span class="dash-icon">📜</span> <span class="flex-1">My Sifaris</span>
+                </a>
+
+                <div class="nav-group {{ $myDonationsOpen ? 'is-open' : '' }}">
+                    <button type="button" class="nav-group-toggle dash-link {{ $myDonationsOpen ? 'is-active' : '' }}" aria-expanded="{{ $myDonationsOpen ? 'true' : 'false' }}">
+                        <span class="dash-icon">💝</span>
+                        <span class="flex-1">My Donations</span>
+                        @if ($myReturned)
+                        <span class="rounded-full bg-gold px-2 py-0.5 text-[10px] font-extrabold text-navy" title="Returned for correction">{{ $myReturned }}</span>
+                        @endif
+                        <svg xmlns="http://www.w3.org/2000/svg" class="nav-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="nav-group-panel">
+                        <div class="nav-group-inner">
+                            <div class="ml-7 mt-1 space-y-0.5 border-l border-white/15 pb-1 pl-3">
+                                @foreach ($myDonationLinks as $link)
+                                <a href="{{ $link['href'] }}" style="--i: {{ $loop->index }}" class="dash-sublink {{ $link['active'] ? 'is-active' : '' }}">
+                                    <span class="w-5 text-center">{{ $link['icon'] }}</span> <span class="flex-1 truncate">{{ $link['label'] }}</span>
+                                    @if ($link['badge'])
+                                    <span class="rounded-full bg-gold px-1.5 text-[10px] font-extrabold text-navy">{{ $link['badge'] }}</span>
+                                    @endif
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @can('settings.manage')
                 <a href="{{ route('dashboard.settings') }}" class="dash-link {{ request()->routeIs('dashboard.settings') ? 'is-active' : '' }}">
                     <span class="dash-icon">⚙️</span> <span class="flex-1">Site &amp; About Settings</span>
                 </a>
+                @endcan
 
+                @if ($navItems->isNotEmpty())
                 <div class="dash-section-label">Manage content</div>
+                @endif
 
                 @foreach ($groups as $groupKey => $groupLabel)
                     @continue(! $navItems->has($groupKey))
@@ -127,7 +193,6 @@
                         </div>
                     @endif
                 @endforeach
-                @endrole
             </nav>
 
             {{-- Signed-in user --}}

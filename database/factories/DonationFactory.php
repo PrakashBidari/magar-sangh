@@ -16,6 +16,7 @@ class DonationFactory extends Factory
             'amount' => fake()->randomElement([500, 1000, 1500, 2000, 2500, 5000, 7500, 10000, 15000, 25000, 50000, 100000]),
             'address' => fake()->city() . ', Nepal',
             'donate_date' => fake()->dateTimeBetween('-2 years', 'now'),
+            'status' => 'approved',
         ];
     }
 }

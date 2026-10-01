@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initGoogleTranslate();
     initLanguageToggle();
     initGalleryTabs();
+    initCommitteeTabs();
     initLightbox();
     initSwipers();
     initPaginationScrollPreservation();
@@ -173,6 +174,37 @@ function initGalleryTabs() {
                 }
             });
         });
+    });
+}
+
+// Committee page: sub type tabs ("All" by default) filter the current and past member cards.
+function initCommitteeTabs() {
+    document.querySelectorAll('.committee-page').forEach((page) => {
+        const tabs = page.querySelectorAll('[data-sub-tab]');
+
+        const show = (target) => {
+            tabs.forEach((t) => {
+                const active = t.dataset.subTab === target;
+                t.setAttribute('aria-selected', active ? 'true' : 'false');
+                t.classList.toggle('bg-maroon', active);
+                t.classList.toggle('text-white', active);
+                t.classList.toggle('text-maroon', !active);
+                t.classList.toggle('hover:bg-gray-100', !active);
+            });
+
+            page.querySelectorAll('[data-member-block]').forEach((block) => {
+                let visible = 0;
+                block.querySelectorAll('[data-sub]').forEach((card) => {
+                    const match = target === 'all' || card.dataset.sub === target;
+                    card.classList.toggle('hidden', !match);
+                    if (match) visible++;
+                });
+                block.querySelector('[data-empty]')?.classList.toggle('hidden', visible > 0);
+                if (block.hasAttribute('data-hide-when-empty')) block.classList.toggle('hidden', visible === 0);
+            });
+        };
+
+        tabs.forEach((tab) => tab.addEventListener('click', () => show(tab.dataset.subTab)));
     });
 }
 

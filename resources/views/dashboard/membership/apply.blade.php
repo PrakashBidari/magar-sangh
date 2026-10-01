@@ -135,7 +135,7 @@
                 </div>
                 <div>
                     <label for="ward_no" class="text-sm font-semibold text-gray-700">Ward no. {!! $req !!}</label>
-                    <input type="number" id="ward_no" name="ward_no" value="{{ $v('ward_no') }}" min="1" max="35" required inputmode="numeric" class="{{ $input }}">
+                    <input type="text" id="ward_no" name="ward_no" value="{{ $v('ward_no') }}" maxlength="10" required inputmode="decimal" pattern="[0-9]{1,3}(\.[0-9]{1,2})?" title="A number such as 1, 01 or 1.5" placeholder="e.g. 01" class="{{ $input }}">
                     @error('ward_no')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
                 <div class="sm:col-span-2">

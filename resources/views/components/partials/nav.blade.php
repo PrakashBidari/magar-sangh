@@ -21,7 +21,7 @@
                 <ul class="nav-dropdown-menu static mt-0 hidden w-full flex-col bg-maroon-800 text-sm md:absolute md:left-0 md:w-64 md:bg-white md:text-navy md:shadow-xl">
                     <li><a href="{{ route('about.index') }}#history" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Our History</a></li>
                     <li><a href="{{ route('about.index') }}#mission" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Mission &amp; Vision</a></li>
-                    <li><a href="{{ route('about.committee') }}" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Central Committee</a></li>
+                    <li><a href="{{ route('about.committee') }}" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Committees</a></li>
                     <li><a href="{{ route('about.constitution') }}" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Constitution</a></li>
                 </ul>
             </li>
@@ -57,6 +57,10 @@
 
             <li>
                 <a href="{{ route('membership.types') }}" class="{{ $navItem }} {{ $isActive('membership.*') }}">Membership</a>
+            </li>
+
+            <li>
+                <a href="{{ route('sifaris') }}" class="{{ $navItem }} {{ $isActive('sifaris') }}">Sifaris</a>
             </li>
 
             <li>

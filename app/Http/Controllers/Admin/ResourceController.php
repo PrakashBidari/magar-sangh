@@ -104,7 +104,7 @@ class ResourceController extends Controller
         ]);
     }
 
-    public function edit(int|string $id): View
+    public function edit(int|string $id): View|RedirectResponse
     {
         abort_if($this->cfg()['readonly'] ?? false, 404);
 
@@ -143,7 +143,46 @@ class ResourceController extends Controller
         return $this->done('deleted');
     }
 
+    /** Approve an entry of an 'approvable' resource. */
+    public function approve(Request $request, int|string $id): RedirectResponse
+    {
+        abort_unless($this->cfg()['approvable'] ?? false, 404);
+
+        $this->find($id)->approve($request->user());
+
+        return back()->with('dashboard-status', $this->cfg()['singular'].' approved.');
+    }
+
+    /** Disapprove (or return) an entry of an 'approvable' resource, with an optional or required reason. */
+    public function reject(Request $request, int|string $id): RedirectResponse
+    {
+        $cfg = $this->cfg();
+        abort_unless($cfg['approvable'] ?? false, 404);
+
+        $data = $request->validate([
+            'reason' => [($cfg['reject_reason'] ?? false) ? 'required' : 'nullable', 'string', 'max:500'],
+        ]);
+
+        $this->find($id)->reject($request->user(), $data['reason'] ?? null);
+
+        return back()->with('dashboard-status', $cfg['singular'].' '.Str::lower($cfg['rejected_label'] ?? 'disapproved').'.');
+    }
+
     // ------------------------------------------------------------------ hooks (override in subclasses)
+
+    /** Where the create / edit form posts to. */
+    protected function formAction(?Model $model): string
+    {
+        return $model
+            ? route($this->routeName('update'), $model->getKey())
+            : route($this->routeName('store'));
+    }
+
+    /** The list page the form's Back and Cancel links return to. */
+    protected function listUrl(): string
+    {
+        return route($this->routeName('index'));
+    }
 
     protected function deleteBlockedReason(Model $model): ?string
     {
@@ -184,7 +223,8 @@ class ResourceController extends Controller
                     'max:'.($field['max'] ?? 10240),
                 ])),
                 'checkbox' => ['nullable', 'boolean'],
-                default => explode('|', $field['rules'] ?? 'nullable'),
+                // 'rules' may be a pipe string or, when a rule contains '|' (e.g. a regex), an array.
+                default => is_array($field['rules'] ?? null) ? $field['rules'] : explode('|', $field['rules'] ?? 'nullable'),
             };
 
             if ($name === 'slug') {
@@ -236,28 +276,40 @@ class ResourceController extends Controller
 
     protected function formView(?Model $model): View
     {
+        $cfg = $this->cfg();
         $suggestions = [];
 
-        foreach ($this->fields() as $field) {
+        foreach ($cfg['fields'] as $i => $field) {
             if ($field['suggest'] ?? false) {
                 $suggestions[$field['name']] = $this->modelClass()::query()
                     ->whereNotNull($field['name'])->distinct()->orderBy($field['name'])->pluck($field['name']);
+            }
+
+            // Select options loaded from another model (config files cannot hold closures).
+            if (isset($field['options_from'])) {
+                $cfg['fields'][$i]['options'] = $field['options_from']::options();
+            }
+
+            // Options that only apply to the value picked in another select (e.g. sub types of a committee).
+            if (isset($field['depends_on'], $field['options_from'])) {
+                $cfg['fields'][$i]['option_parents'] = $field['options_from']::optionParents();
             }
         }
 
         return view('dashboard.resource.form', [
             'key' => $this->key(),
-            'cfg' => $this->cfg(),
+            'cfg' => $cfg,
             'model' => $model,
             'values' => $this->formValues($model),
             'suggestions' => $suggestions,
+            'action' => $this->formAction($model),
+            'listUrl' => $this->listUrl(),
         ]);
     }
 
     protected function done(string $verb): RedirectResponse
     {
-        return redirect()
-            ->route($this->routeName('index'))
+        return redirect($this->listUrl())
             ->with('dashboard-status', $this->cfg()['singular'].' '.$verb.' successfully.');
     }
 

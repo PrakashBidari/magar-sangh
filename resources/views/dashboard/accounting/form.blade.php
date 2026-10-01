@@ -56,6 +56,9 @@
                     {{-- Filled from the chosen type by the script below; the server-side value is kept for editing --}}
                     @if ($category)<option value="{{ $category }}" selected>{{ $category }}</option>@endif
                 </select>
+                @can('accounting-categories.view')
+                <p class="mt-1 text-xs text-gray-400">Missing a category? <a href="{{ route('dashboard.accounting-categories.index') }}" class="font-semibold text-navy hover:underline">Manage Entry Categories</a></p>
+                @endcan
                 @error('category') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 

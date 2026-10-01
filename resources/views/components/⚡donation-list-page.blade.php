@@ -29,12 +29,12 @@ new class extends Component
 
     public function getTopDonorsProperty()
     {
-        return Donation::orderByDesc('amount')->take(5)->get();
+        return Donation::approved()->orderByDesc('amount')->take(5)->get();
     }
 
     public function getDonationsProperty()
     {
-        return Donation::query()
+        return Donation::approved()
             ->when($this->search, fn ($q) => $q->where(function ($q) {
                 $q->where('donor_name', 'like', "%{$this->search}%")
                     ->orWhere('address', 'like', "%{$this->search}%");

@@ -18,6 +18,12 @@ class NewsFactory extends Factory
             'body' => '<p>' . fake()->paragraphs(5, true) . '</p>',
             'image_url' => 'https://picsum.photos/seed/news-' . fake()->unique()->numberBetween(1, 5000) . '/900/600',
             'published_at' => fake()->dateTimeBetween('-1 year', 'now'),
+            'status' => 'approved',
         ];
+    }
+
+    public function pending(): static
+    {
+        return $this->state(['status' => 'pending']);
     }
 }

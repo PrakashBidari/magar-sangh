@@ -52,7 +52,8 @@ class MembershipApplicationRequest extends FormRequest
             'province' => ['required', Rule::in(array_keys($provinces))],
             'district' => ['required', Rule::in(array_keys($districts))],
             'municipality' => ['required', Rule::in($districts[$this->input('district')] ?? [])],
-            'ward_no' => ['required', 'integer', 'min:1', 'max:35'],
+            // Kept exactly as typed, so "01" and "1.5" are allowed.
+            'ward_no' => ['required', 'regex:/^[0-9]{1,3}(\.[0-9]{1,2})?$/', 'numeric', 'gt:0', 'max:35'],
             'mobile' => ['required', 'regex:/^\+?[0-9][0-9\s\-]{6,18}$/'],
             'email' => ['required', 'email', 'max:255'],
             'occupation' => ['required', 'string', 'max:255'],

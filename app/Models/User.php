@@ -55,6 +55,11 @@ class User extends Authenticatable
         return $this->hasMany(Membership::class);
     }
 
+    public function sifarisRequests(): HasMany
+    {
+        return $this->hasMany(SifarisRequest::class);
+    }
+
     /** The approved, unexpired membership (if any); the newest one wins. */
     public function activeMembership(): HasOne
     {

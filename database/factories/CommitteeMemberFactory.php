@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\CommitteeType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CommitteeMemberFactory extends Factory
@@ -9,7 +10,9 @@ class CommitteeMemberFactory extends Factory
     public function definition(): array
     {
         return [
+            'committee_type_id' => CommitteeType::factory(),
             'name' => fake()->name('male'),
+            'phone' => '98'.fake()->numerify('########'),
             'photo_url' => 'https://i.pravatar.cc/300?img=' . fake()->numberBetween(1, 70),
             'position_np' => fake()->randomElement(['केन्द्रीय सदस्य', 'सचिव', 'कोषाध्यक्ष', 'उपाध्यक्ष']),
             'position_en' => fake()->randomElement(['Central Member', 'Secretary', 'Treasurer', 'Vice President']),
@@ -20,6 +23,19 @@ class CommitteeMemberFactory extends Factory
             'is_current' => true,
             'sort_order' => fake()->numberBetween(1, 50),
         ];
+    }
+
+    /** A former member of the committee, with a random past term. */
+    public function past(): self
+    {
+        return $this->state(function () {
+            $startYear = fake()->numberBetween(2065, 2075);
+
+            return [
+                'term_label' => $this->toNepaliNumber($startYear) . ' – ' . $this->toNepaliNumber($startYear + 4),
+                'is_current' => false,
+            ];
+        });
     }
 
     public function pastPresident(int $index = 0): self
@@ -33,6 +49,7 @@ class CommitteeMemberFactory extends Factory
             'term_label' => $this->toNepaliNumber($startYear) . ' – ' . $this->toNepaliNumber($endYear),
             'is_past_president' => true,
             'is_current' => false,
+            'show_on_homepage' => true,
         ]);
     }
 

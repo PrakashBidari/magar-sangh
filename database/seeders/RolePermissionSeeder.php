@@ -2,35 +2,20 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\Role;
+use App\Support\Permissions;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $permissions = [
-            'manage-users',
-            'manage-settings',
-            'manage-donations',
-            'manage-content',
-        ];
+        // One permission per dashboard section and action, e.g. "news.create" (see config/admin.php).
+        Permissions::sync();
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
-        }
-
-        $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $admin->syncPermissions($permissions);
-
-        Role::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
-
-        // The site only has two roles: admin and user. Fold any legacy "editor" accounts into "user".
-        if ($editor = Role::where('name', 'editor')->where('guard_name', 'web')->first()) {
-            User::role('editor')->get()->each(fn (User $u) => $u->syncRoles('user'));
-            $editor->delete();
-        }
+        // Built-in roles. Admin passes every permission check (see AppServiceProvider),
+        // "user" is given to everyone who registers. More roles are made in the dashboard.
+        Role::firstOrCreate(['name' => Permissions::ADMIN_ROLE, 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => Permissions::USER_ROLE, 'guard_name' => 'web']);
     }
 }

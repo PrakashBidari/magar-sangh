@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CommitteeType;
 use App\Models\ContactMessage;
 use App\Models\GalleryVideo;
 use App\Models\News;
@@ -154,7 +155,7 @@ class DashboardResourcesTest extends TestCase
         $this->actingAs($admin)->post(route('dashboard.gallery-photos.store'), ['title' => 'x'])->assertSessionHasErrors('image_url');
 
         $this->actingAs($admin)->post(route('dashboard.committee.store'), [
-            'name' => 'Some Person', 'position_np' => 'अध्यक्ष', 'is_current' => '1', 'is_past_president' => '0',
+            'name' => 'Some Person', 'phone' => '9841234567', 'position_np' => 'अध्यक्ष', 'committee_type_id' => CommitteeType::factory()->create()->id, 'is_current' => '1', 'is_past_president' => '0',
         ])->assertRedirect();
 
         $this->assertDatabaseHas('committee_members', ['name' => 'Some Person', 'is_current' => 1, 'is_past_president' => 0, 'sort_order' => 0]);

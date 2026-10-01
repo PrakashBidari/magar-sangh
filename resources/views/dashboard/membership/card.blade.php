@@ -1,5 +1,5 @@
 @php
-    $backUrl = auth()->user()->hasRole('admin') && $membership->user_id !== auth()->id()
+    $backUrl = auth()->user()->can('membership-applications.view') && $membership->user_id !== auth()->id()
         ? route('dashboard.membership.show', $membership)
         : route('dashboard.my-membership.show');
     // Municipality / Rural municipality-Ward, District, Province
