@@ -54,6 +54,14 @@ class DonationReviewTest extends TestCase
         $this->actingAs($member)->get(route('dashboard.my-donations.index'))->assertOk()->assertSee('No donations yet');
     }
 
+    public function test_home_banner_has_a_donate_now_button_that_sends_guests_to_login(): void
+    {
+        $this->get(route('home'))->assertOk()->assertSee('Donate Now')->assertSee(route('dashboard.my-donations.create'), false);
+
+        $this->get(route('dashboard.my-donations.create'))->assertRedirect(route('login'));
+        $this->actingAs($this->member())->get(route('dashboard.my-donations.create'))->assertOk()->assertSee('Apply For Donation');
+    }
+
     public function test_qr_and_bank_details_from_settings_are_shown_on_the_apply_page(): void
     {
         $admin = $this->admin();

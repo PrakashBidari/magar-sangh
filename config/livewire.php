@@ -70,7 +70,7 @@ return [
 
     'make_command' => [
         'type' => 'sfc', // Options: 'sfc', 'mfc', 'class'
-        'emoji' => true, // Options: true, false
+        'emoji' => false, // Options: true, false (kept off: shared hosting uploads break emoji file names)
         'with' => [
             'js' => false,
             'css' => false,

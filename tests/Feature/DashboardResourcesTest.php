@@ -226,10 +226,11 @@ class DashboardResourcesTest extends TestCase
     {
         $this->get(route('home'))->assertOk()
             ->assertSee(route('login'), false)->assertSee(route('register'), false)
-            ->assertDontSee(route('dashboard.index'), false);
+            // The exact link: the banner's "Donate Now" button points under /dashboard for everyone.
+            ->assertDontSee('href="'.route('dashboard.index').'"', false);
 
         $this->actingAs($this->member())->get(route('home'))->assertOk()
-            ->assertSee(route('dashboard.index'), false)
+            ->assertSee('href="'.route('dashboard.index').'"', false)
             ->assertDontSee(route('login'), false);
     }
     public function test_hero_slider_is_managed_from_the_dashboard_and_shown_on_the_homepage(): void

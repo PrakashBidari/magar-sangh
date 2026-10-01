@@ -22,6 +22,7 @@
                     <li><a href="{{ route('about.index') }}#history" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Our History</a></li>
                     <li><a href="{{ route('about.index') }}#mission" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Mission &amp; Vision</a></li>
                     <li><a href="{{ route('about.committee') }}" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Committees</a></li>
+                    <li><a href="{{ route('about.office-assistants') }}" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Office Assistant</a></li>
                     <li><a href="{{ route('about.constitution') }}" class="block px-5 py-3 hover:bg-maroon-700 md:hover:bg-gray-100">Constitution</a></li>
                 </ul>
             </li>

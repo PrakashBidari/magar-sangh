@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CommitteeType;
+use App\Models\OfficeAssistant;
 use App\Models\Setting;
 
 class AboutController extends Controller
@@ -45,6 +46,14 @@ class AboutController extends Controller
             'past' => $members->where('is_current', false)->values(),
             'otherCommittees' => $otherCommittees,
         ]);
+    }
+
+    /** Office staff, managed from Dashboard > Organization > Office Assistant. */
+    public function officeAssistants()
+    {
+        $assistants = OfficeAssistant::query()->orderBy('sort_order')->orderBy('id')->get();
+
+        return view('about.office-assistants', compact('assistants'));
     }
 
     public function constitution()

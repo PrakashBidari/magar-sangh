@@ -22,6 +22,7 @@ use App\Models\HeroSlide;
 use App\Models\MembershipType;
 use App\Models\News;
 use App\Models\NotificationItem;
+use App\Models\OfficeAssistant;
 use App\Models\Publication;
 use App\Models\Role;
 use App\Models\SisterOrganization;
@@ -348,6 +349,30 @@ return [
                 ['name' => 'is_current', 'label' => 'Part of the current committee', 'type' => 'checkbox'],
                 ['name' => 'is_past_president', 'label' => 'Is a past president', 'type' => 'checkbox'],
                 ['name' => 'show_on_homepage', 'label' => 'Show on the homepage', 'type' => 'checkbox', 'default' => false],
+            ],
+        ],
+
+        // Listed on the public "Office Assistant" page under About Us.
+        'office-assistants' => [
+            'group' => 'organization',
+            'label' => 'Office Assistant',
+            'singular' => 'Office Assistant',
+            'icon' => '🧑‍💼',
+            'model' => OfficeAssistant::class,
+            'order' => ['sort_order', 'asc'],
+            'columns' => [
+                ['field' => 'photo_url', 'label' => 'Image', 'type' => 'image'],
+                ['field' => 'name', 'label' => 'Name'],
+                ['field' => 'phone', 'label' => 'Phone No.'],
+                ['field' => 'email', 'label' => 'Email'],
+                ['field' => 'sort_order', 'label' => 'Order'],
+            ],
+            'fields' => [
+                ['name' => 'name', 'label' => 'Name', 'type' => 'text', 'rules' => 'required|string|max:255', 'class' => 'np'],
+                ['name' => 'photo_url', 'label' => 'Image', 'type' => 'image', 'folder' => 'office-assistants', 'required_on_create' => true, 'max' => 10240],
+                ['name' => 'phone', 'label' => 'Phone No.', 'type' => 'tel', 'rules' => ['required', 'string', 'max:30', 'regex:/^\+?[0-9][0-9\s\-]{6,18}$/'], 'width' => 'half', 'help' => 'e.g. 98XXXXXXXX'],
+                ['name' => 'email', 'label' => 'Email', 'type' => 'email', 'rules' => 'nullable|email|max:255', 'width' => 'half', 'help' => 'Optional.'],
+                ['name' => 'sort_order', 'label' => 'Sort Order', 'type' => 'number', 'rules' => 'nullable|integer|min:0', 'width' => 'half', 'default' => 0, 'help' => 'Smaller numbers are listed first.'],
             ],
         ],
 

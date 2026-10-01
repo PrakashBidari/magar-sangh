@@ -24,6 +24,11 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-3a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0"/></svg>
                             Become a Member
                         </a>
+                        {{-- Guests are sent to login first, then land on the "Apply For Donation" page --}}
+                        <a href="{{ route('dashboard.my-donations.create') }}" class="btn-navy-outline">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                            Donate Now
+                        </a>
                     </div>
                 </div>
             </div>

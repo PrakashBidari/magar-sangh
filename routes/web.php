@@ -37,6 +37,7 @@ Route::prefix('about')->name('about.')->group(function () {
     Route::get('/', [AboutController::class, 'index'])->name('index');
     Route::get('/committee', [AboutController::class, 'committee'])->name('committee');
     Route::get('/committee/{committeeType}', [AboutController::class, 'committeeShow'])->whereNumber('committeeType')->name('committee.show');
+    Route::get('/office-assistant', [AboutController::class, 'officeAssistants'])->name('office-assistants');
     Route::get('/constitution', [AboutController::class, 'constitution'])->name('constitution');
 });
 
