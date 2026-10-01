@@ -21,7 +21,7 @@
     $myDonationsOpen = request()->routeIs('dashboard.my-donations.*');
     $myReturned = \App\Models\Donation::whereBelongsTo($me)->where('status', 'returned')->count();
     $myDonationLinks = [
-        ['label' => 'Add Donation', 'icon' => '➕', 'href' => route('dashboard.my-donations.create'), 'active' => request()->routeIs('dashboard.my-donations.create'), 'badge' => null],
+        ['label' => 'Apply For Donation', 'icon' => '➕', 'href' => route('dashboard.my-donations.create'), 'active' => request()->routeIs('dashboard.my-donations.create'), 'badge' => null],
         ['label' => 'View & Edit Donations', 'icon' => '📋', 'href' => route('dashboard.my-donations.index'), 'active' => request()->routeIs('dashboard.my-donations.index', 'dashboard.my-donations.show', 'dashboard.my-donations.edit'), 'badge' => $myReturned ?: null],
     ];
 

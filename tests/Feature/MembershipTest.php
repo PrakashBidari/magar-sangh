@@ -40,8 +40,7 @@ class MembershipTest extends TestCase
     {
         return array_merge([
             'membership_type_id' => $type->id,
-            'full_name' => 'Sita',
-            'surname' => 'Thapa Magar',
+            'full_name' => 'Sita Thapa Magar',
             'date_of_birth' => '1995-04-12',
             'permanent_address' => 'Liwang, Rolpa',
             'current_address' => 'Kathmandu',

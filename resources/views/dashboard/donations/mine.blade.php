@@ -5,7 +5,7 @@
                 <h2 class="text-xl font-bold text-navy">💰 My Donations</h2>
                 <p class="text-sm text-gray-500">Donations you added. An admin checks each one before it is approved.</p>
             </div>
-            <a href="{{ route('dashboard.my-donations.create') }}" class="btn-maroon justify-center">+ Add Donation</a>
+            <a href="{{ route('dashboard.my-donations.create') }}" class="btn-maroon justify-center">+ Apply For Donation</a>
         </div>
 
         @if (session('dashboard-status'))
@@ -19,8 +19,8 @@
         <div class="card mt-5 text-center">
             <div class="text-5xl">💰</div>
             <h3 class="mt-3 text-lg font-bold text-navy">No donations yet</h3>
-            <p class="mx-auto mt-1 max-w-md text-sm text-gray-600">Add your donation here. Once an admin approves it, it will be shown as approved.</p>
-            <a href="{{ route('dashboard.my-donations.create') }}" class="btn-maroon mt-5 justify-center">Add Donation</a>
+            <p class="mx-auto mt-1 max-w-md text-sm text-gray-600">Apply for your donation here. Once an admin approves it, it will be shown as approved.</p>
+            <a href="{{ route('dashboard.my-donations.create') }}" class="btn-maroon mt-5 justify-center">Apply For Donation</a>
         </div>
         @else
         <div class="mt-5 flex flex-col gap-1 rounded-lg bg-navy p-5 text-white shadow-md sm:flex-row sm:items-center sm:justify-between">

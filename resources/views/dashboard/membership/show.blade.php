@@ -2,7 +2,6 @@
     $listRoute = 'dashboard.membership.'.$membership->status;
     $details = [
         'Full name' => $membership->full_name,
-        'Surname' => $membership->surname,
         'Date of birth' => $membership->date_of_birth->format('d M, Y'),
         'Mobile' => $membership->mobile,
         'Email' => $membership->email,

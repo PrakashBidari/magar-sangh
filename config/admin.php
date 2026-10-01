@@ -163,14 +163,23 @@ return [
             'model' => NotificationItem::class,
             'order' => ['published_at', 'desc'],
             'columns' => [
+                ['field' => 'image_url', 'label' => 'Image', 'type' => 'image'],
                 ['field' => 'title', 'label' => 'Title'],
                 ['field' => 'published_at', 'label' => 'Published', 'type' => 'datetime'],
+                ['field' => 'show_popup', 'label' => 'Popup', 'type' => 'boolean'],
             ],
             'fields' => [
                 ['name' => 'title', 'label' => 'Title', 'type' => 'text', 'rules' => 'required|string|max:255'],
                 ['name' => 'slug', 'label' => 'Slug (URL)', 'type' => 'text', 'rules' => 'nullable|string|max:255', 'help' => 'Leave blank to generate from the title.', 'width' => 'half'],
                 ['name' => 'published_at', 'label' => 'Publish Date & Time', 'type' => 'datetime', 'rules' => 'nullable|date', 'width' => 'half', 'default' => 'now'],
+                ['name' => 'image_url', 'label' => 'Image', 'type' => 'image', 'folder' => 'notifications', 'max' => 6144, 'help' => 'Optional. Shown on the notification page and in the popup.'],
                 ['name' => 'body', 'label' => 'Description', 'type' => 'richtext', 'rules' => 'nullable|string'],
+                // Popup on the public website (see resources/views/partials/notification-popup.blade.php).
+                ['name' => 'show_popup', 'label' => 'Show this notification as a popup on the website', 'type' => 'checkbox', 'default' => false],
+                ['name' => 'popup_pages', 'label' => 'Popup: where', 'type' => 'select', 'options' => ['home' => 'Home page only', 'all' => 'Every page'], 'rules' => 'nullable|in:home,all', 'width' => 'half', 'default' => 'home', 'show_if' => 'show_popup'],
+                ['name' => 'popup_frequency', 'label' => 'Popup: how often', 'type' => 'select', 'options' => ['once' => 'Only the first time a visitor comes', 'always' => 'Every time a page is loaded'], 'rules' => 'nullable|in:once,always', 'width' => 'half', 'default' => 'once', 'show_if' => 'show_popup'],
+                ['name' => 'popup_repeat_minutes', 'label' => 'Popup: show again after every … minutes', 'type' => 'number', 'rules' => 'nullable|integer|min:1|max:1440', 'width' => 'half', 'help' => 'Leave empty to not repeat. e.g. 10 = again every 10 minutes while the visitor stays on the website.', 'show_if' => 'show_popup'],
+                ['name' => 'popup_on_exit', 'label' => 'Also show when the visitor is about to leave the website', 'type' => 'checkbox', 'width' => 'half', 'default' => false, 'show_if' => 'show_popup', 'help' => 'Works on computers (mouse moves up to close the tab), once per visit.'],
             ],
         ],
 

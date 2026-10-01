@@ -76,13 +76,8 @@
                 <h3 class="{{ $sectionTitle }} sm:col-span-2">2 · Personal details</h3>
                 <div>
                     <label for="full_name" class="text-sm font-semibold text-gray-700">Full name {!! $req !!}</label>
-                    <input type="text" id="full_name" name="full_name" value="{{ $v('full_name') }}" required autocomplete="given-name" class="{{ $input }}">
+                    <input type="text" id="full_name" name="full_name" value="{{ $v('full_name') }}" required autocomplete="name" class="{{ $input }}">
                     @error('full_name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-                </div>
-                <div>
-                    <label for="surname" class="text-sm font-semibold text-gray-700">Surname {!! $req !!}</label>
-                    <input type="text" id="surname" name="surname" value="{{ $v('surname') }}" required autocomplete="family-name" class="{{ $input }}">
-                    @error('surname')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label for="date_of_birth" class="text-sm font-semibold text-gray-700">Date of birth {!! $req !!}</label>

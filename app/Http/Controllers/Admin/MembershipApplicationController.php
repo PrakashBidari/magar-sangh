@@ -58,7 +58,7 @@ class MembershipApplicationController extends Controller
             'types' => MembershipType::query()->orderBy('sort_order')->orderBy('id')->get(),
             'membership' => $membership,
             'values' => $membership->only([
-                'membership_type_id', 'full_name', 'surname', 'permanent_address', 'current_address',
+                'membership_type_id', 'full_name', 'permanent_address', 'current_address',
                 'province', 'district', 'municipality', 'ward_no', 'mobile', 'email', 'occupation',
             ]) + [
                 'date_of_birth' => $membership->date_of_birth?->format('Y-m-d'),

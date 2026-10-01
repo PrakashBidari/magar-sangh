@@ -1,6 +1,6 @@
 @php
     $editing = (bool) $model;
-    $title = ($editing ? 'Edit ' : 'Add ').$cfg['singular'];
+    $title = $heading ?? ($editing ? 'Edit ' : 'Add ').$cfg['singular'];
     $input = 'mt-1 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon';
 @endphp
 <x-layouts.dashboard :title="$title">
@@ -13,6 +13,9 @@
         @if (! empty($notice))
         <div class="mb-4 rounded-md border-l-4 border-orange-400 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">{{ $notice }}</div>
         @endif
+
+        {{-- Optional partial above the form (e.g. where to pay a donation) --}}
+        @if (! empty($before)) @include($before) @endif
 
         @if ($errors->any())
         <div class="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -37,7 +40,7 @@
                     $span = ($field['width'] ?? 'full') === 'half' ? '' : 'sm:col-span-2';
                     $extra = $field['class'] ?? '';
                 @endphp
-                <div class="{{ $span }} min-w-0">
+                <div class="{{ $span }} min-w-0" @isset($field['show_if']) data-show-if="f-{{ $field['show_if'] }}" @endisset>
                     @if ($type !== 'checkbox')
                     <label for="f-{{ $name }}" class="text-sm font-semibold text-gray-700">
                         {{ $field['label'] }}
@@ -177,6 +180,15 @@
                 };
 
                 parent.addEventListener('change', sync);
+                sync();
+            });
+
+            // Fields that only matter while a checkbox is ticked (e.g. the popup options of a notification).
+            form.querySelectorAll('[data-show-if]').forEach((wrapper) => {
+                const checkbox = document.getElementById(wrapper.dataset.showIf);
+                if (!checkbox) return;
+                const sync = () => { wrapper.hidden = !checkbox.checked; };
+                checkbox.addEventListener('change', sync);
                 sync();
             });
 

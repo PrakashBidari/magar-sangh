@@ -45,7 +45,6 @@ class MembershipApplicationRequest extends FormRequest
         return [
             'membership_type_id' => ['required', $typeRule],
             'full_name' => ['required', 'string', 'max:255'],
-            'surname' => ['required', 'string', 'max:255'],
             'date_of_birth' => ['required', 'date', 'after:1900-01-01', 'before:today'],
             'permanent_address' => ['required', 'string', 'max:255'],
             'current_address' => ['required', 'string', 'max:255'],
@@ -71,7 +70,7 @@ class MembershipApplicationRequest extends FormRequest
     public function applicationData(?Membership $existing = null): array
     {
         $data = $this->safe()->only([
-            'membership_type_id', 'full_name', 'surname', 'date_of_birth', 'permanent_address', 'current_address',
+            'membership_type_id', 'full_name', 'date_of_birth', 'permanent_address', 'current_address',
             'province', 'district', 'municipality', 'ward_no', 'mobile', 'email', 'occupation',
         ]);
 

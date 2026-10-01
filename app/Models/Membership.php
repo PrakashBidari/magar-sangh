@@ -19,7 +19,7 @@ class Membership extends Model
 
     protected $fillable = [
         'user_id', 'membership_type_id', 'membership_number', 'status',
-        'full_name', 'surname', 'date_of_birth', 'permanent_address', 'current_address',
+        'full_name', 'date_of_birth', 'permanent_address', 'current_address',
         'province', 'district', 'municipality', 'ward_no', 'mobile', 'email', 'occupation',
         'photo_url', 'signature_url', 'voucher_path',
         'applied_at', 'approved_at', 'expires_at', 'rejected_at', 'rejection_reason', 'reviewed_by',
@@ -92,7 +92,7 @@ class Membership extends Model
 
     public function displayName(): string
     {
-        return trim($this->full_name.' '.$this->surname);
+        return trim((string) $this->full_name);
     }
 
     /** Label for badges: Pending / Active / Expired / Disapproved. */

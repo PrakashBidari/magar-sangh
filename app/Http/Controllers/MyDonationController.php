@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * "My Donations" for every signed-in user: add a donation, follow its review, and
+ * "My Donations" for every signed-in user: apply for (add) a donation, follow its review, and
  * fix and resubmit it when an admin returns it. Reuses the dashboard donation form.
  */
 class MyDonationController extends ResourceController
@@ -126,6 +126,9 @@ class MyDonationController extends ResourceController
                 ? 'An admin returned this donation for correction'.($model->review_note ? ': "'.$model->review_note.'"' : '.').' Fix it and save to send it for review again.'
                 : null,
             'submitLabel' => $model ? 'Save & Resubmit' : 'Submit Donation',
+            'heading' => $model ? null : 'Apply For Donation',
+            // QR and bank details from Lakhan Thapa Pratisthan > Settings.
+            'before' => 'dashboard.donations._payment-details',
         ]);
     }
 

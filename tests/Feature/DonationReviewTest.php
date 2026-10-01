@@ -4,11 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Donation;
 use App\Models\Role;
+use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class DonationReviewTest extends TestCase
@@ -50,6 +52,46 @@ class DonationReviewTest extends TestCase
 
         $this->actingAs($member)->get(route('dashboard.my-donations.create'))->assertOk()->assertSee('Submit Donation')->assertSee('Sita Magar');
         $this->actingAs($member)->get(route('dashboard.my-donations.index'))->assertOk()->assertSee('No donations yet');
+    }
+
+    public function test_qr_and_bank_details_from_settings_are_shown_on_the_apply_page(): void
+    {
+        $admin = $this->admin();
+        $member = $this->member();
+
+        // Nothing set yet: no payment box.
+        $this->actingAs($member)->get(route('dashboard.my-donations.create'))
+            ->assertOk()->assertSee('Apply For Donation')->assertDontSee('How to donate');
+
+        $this->actingAs($admin)->put(route('dashboard.donation-settings.update'), [
+            'donation_qr' => UploadedFile::fake()->create('qr.pdf', 10, 'application/pdf'),
+        ])->assertSessionHasErrors('donation_qr');
+
+        $this->actingAs($admin)->put(route('dashboard.donation-settings.update'), [
+            'donation_page_content' => '<p>About the fund</p>',
+            'donation_qr' => UploadedFile::fake()->image('qr.png', 400, 400),
+            'donation_bank_details' => "Nepal Bank Ltd, Kathmandu\nAccount no.: 0123456789",
+        ])->assertRedirect(route('dashboard.donation-settings'));
+
+        $settings = Setting::current()->fresh();
+        $this->assertStringStartsWith('/storage/donation-qr/', $settings->donation_qr_url);
+        Storage::disk('public')->assertExists(Str::after($settings->donation_qr_url, '/storage/'));
+        $this->assertSame('<p>About the fund</p>', $settings->donation_page_content);
+
+        $this->actingAs($admin)->get(route('dashboard.donation-settings'))->assertOk()->assertSee($settings->donation_qr_url, false)->assertSee('0123456789');
+        $this->actingAs($member)->get(route('dashboard.my-donations.create'))
+            ->assertOk()->assertSee('How to donate')->assertSee($settings->donation_qr_url, false)
+            ->assertSee('Nepal Bank Ltd, Kathmandu<br />', false)->assertSee('Account no.: 0123456789');
+
+        // Removing the QR keeps the bank details.
+        $this->actingAs($admin)->put(route('dashboard.donation-settings.update'), [
+            'donation_page_content' => '<p>About the fund</p>',
+            'donation_bank_details' => 'Account no.: 0123456789',
+            'remove_donation_qr' => '1',
+        ]);
+        $this->assertNull(Setting::current()->fresh()->donation_qr_url);
+        Storage::disk('public')->assertMissing(Str::after($settings->donation_qr_url, '/storage/'));
+        $this->actingAs($member)->get(route('dashboard.my-donations.create'))->assertSee('How to donate')->assertDontSee('Scan to pay');
     }
 
     public function test_full_add_return_resubmit_approve_flow(): void

@@ -24,6 +24,8 @@
 
     <div id="google_translate_element"></div>
 
+    @include('partials.notification-popup')
+
     @livewireScripts
     @stack('scripts')
 </body>

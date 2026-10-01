@@ -3,7 +3,7 @@
         <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div>
                 <h2 class="text-xl font-bold text-navy">⚙️ Lakhan Thapa Pratisthan Settings</h2>
-                <p class="text-sm text-gray-500">Content shown above the donation list on the public Lakhan Thapa Pratisthan page.</p>
+                <p class="text-sm text-gray-500">The public Lakhan Thapa Pratisthan page, and the payment details members see when they apply for a donation.</p>
             </div>
             <a href="{{ route('donation-list') }}" target="_blank" class="text-sm font-semibold text-maroon hover:underline">View page ↗</a>
         </div>
@@ -12,11 +12,13 @@
         <div class="mb-4 rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">{{ session('dashboard-status') }}</div>
         @endif
 
-        @error('donation_page_content')
+        @foreach (['donation_page_content', 'donation_qr', 'donation_bank_details'] as $errorField)
+        @error($errorField)
         <div class="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{{ $message }}</div>
         @enderror
+        @endforeach
 
-        <form method="POST" action="{{ route('dashboard.donation-settings.update') }}" id="donation-settings-form" class="card space-y-4">
+        <form method="POST" action="{{ route('dashboard.donation-settings.update') }}" enctype="multipart/form-data" id="donation-settings-form" class="card space-y-4">
             @csrf
             @method('PUT')
 
@@ -24,6 +26,40 @@
                 <label for="donation_page_content" class="text-sm font-semibold text-gray-700">Page Content</label>
                 <p class="mb-2 text-xs text-gray-500">Add text, images (🖼 button) and PDF files (📎 file button, max 10 MB). PDFs are shown with a preview on the page.</p>
                 <textarea id="donation_page_content" name="donation_page_content">{{ old('donation_page_content', $settings->donation_page_content) }}</textarea>
+            </div>
+
+            {{-- Shown to members on Dashboard > My Donations > Apply For Donation --}}
+            <div class="border-t pt-4">
+                <h3 class="font-bold text-navy">🏦 Payment details for donors</h3>
+                <p class="text-xs text-gray-500">Shown on the "Apply For Donation" page so members know where to pay before they upload the voucher.</p>
+
+                <div class="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div>
+                        <label for="donation_qr" class="text-sm font-semibold text-gray-700">Payment QR code</label>
+                        <p class="text-xs text-gray-500">Image of the bank / e-wallet QR (PNG, JPG or WEBP, max 4 MB).</p>
+                        <input type="file" id="donation_qr" name="donation_qr" accept="image/png,image/jpeg,image/webp" class="mt-2 w-full text-sm">
+                        <div class="mt-3 flex flex-wrap items-center gap-4">
+                            <div id="donation-qr-preview" class="flex h-40 w-40 shrink-0 items-center justify-center rounded-md border border-dashed border-gray-300 bg-white p-1">
+                                @if ($settings->donation_qr_url)
+                                <img src="{{ $settings->donation_qr_url }}" alt="Payment QR" class="max-h-full max-w-full object-contain">
+                                @else
+                                <span class="text-xs text-gray-400">No QR uploaded</span>
+                                @endif
+                            </div>
+                            @if ($settings->donation_qr_url)
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input type="checkbox" name="remove_donation_qr" value="1" class="rounded border-gray-300 text-maroon focus:ring-maroon">
+                                Remove QR
+                            </label>
+                            @endif
+                        </div>
+                    </div>
+                    <div>
+                        <label for="donation_bank_details" class="text-sm font-semibold text-gray-700">Bank details</label>
+                        <p class="text-xs text-gray-500">One item per line, e.g. bank name, branch, account name, account number.</p>
+                        <textarea id="donation_bank_details" name="donation_bank_details" rows="7" maxlength="2000" class="np mt-2 w-full rounded-md border-gray-300 text-sm focus:border-maroon focus:ring-maroon">{{ old('donation_bank_details', $settings->donation_bank_details) }}</textarea>
+                    </div>
+                </div>
             </div>
 
             <div class="flex justify-end">
@@ -78,6 +114,15 @@
             NepalRichEditor.init(document.getElementById('donation_page_content'))
                 .then((instance) => (editor = instance))
                 .catch(() => {});
+
+            document.getElementById('donation_qr').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'max-h-full max-w-full object-contain';
+                document.getElementById('donation-qr-preview').replaceChildren(img);
+            });
 
             form.addEventListener('submit', () => {
                 editor?.synchronizeValues();
