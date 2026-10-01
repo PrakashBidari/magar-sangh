@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Anuzpandey\LaravelNepaliDate\LaravelNepaliDate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
@@ -88,9 +89,21 @@ class SifarisRequest extends Model
         };
     }
 
-    /** @param array{letter_number?: ?string, dispatch_number?: ?string, letter_date?: ?string} $letter */
+    /** Today's date in Bikram Sambat as printed on the letter, e.g. २०८३/०६/१५. */
+    public static function todayBs(): string
+    {
+        return LaravelNepaliDate::from(now('Asia/Kathmandu')->toDateString())->toNepaliDate('Y/m/d', 'np');
+    }
+
+    /**
+     * A blank letter date becomes the approval date.
+     *
+     * @param array{letter_number?: ?string, dispatch_number?: ?string, letter_date?: ?string} $letter
+     */
     public function approve(User $reviewer, array $letter = []): void
     {
+        $letter['letter_date'] = ($letter['letter_date'] ?? null) ?: self::todayBs();
+
         $this->forceFill($letter + [
             'status' => self::APPROVED,
             'approved_at' => now(),

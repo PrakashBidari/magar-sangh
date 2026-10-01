@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MembershipSettingController;
 use App\Http\Controllers\Admin\ResourceController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SifarisRequestController;
+use App\Http\Controllers\Admin\SifarisSettingController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ContactController;
@@ -133,6 +134,12 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
                 Route::get('/pending', 'pending')->name('pending');
                 Route::get('/approved', 'approved')->name('approved');
                 Route::get('/disapproved', 'rejected')->name('rejected');
+            });
+
+            // Signature, signatory and contact details printed on every letter (one row, edit only).
+            Route::middleware('can:sifaris-settings.manage')->group(function () {
+                Route::get('/settings', [SifarisSettingController::class, 'edit'])->name('settings');
+                Route::put('/settings', [SifarisSettingController::class, 'update'])->name('settings.update');
             });
 
             Route::prefix('{sifaris}')->whereNumber('sifaris')->group(function () {

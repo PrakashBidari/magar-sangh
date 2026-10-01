@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SettingSeeder::class,
             MembershipTypeSeeder::class,
+            SifarisSettingSeeder::class,
             HeroSlideSeeder::class,
             CommitteeTypeSeeder::class,
             CommitteeMemberSeeder::class,

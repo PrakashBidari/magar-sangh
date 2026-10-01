@@ -155,14 +155,13 @@
                 </div>
             </section>
 
-            {{-- 4. Photo, signature, voucher --}}
+            {{-- 4. Photo, voucher --}}
             <section class="card">
-                <h3 class="{{ $sectionTitle }}">4 · Photograph, signature &amp; payment voucher</h3>
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+                <h3 class="{{ $sectionTitle }}">4 · Photograph &amp; payment voucher</h3>
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
                     @php
                         $uploads = [
                             ['name' => 'photo', 'label' => 'Photograph', 'required' => ! $editing, 'current' => $membership?->photo_url, 'hint' => 'Passport-size, clear face. JPG/PNG/WEBP, up to 3 MB.', 'box' => 'h-36 w-28'],
-                            ['name' => 'signature', 'label' => 'Applicant\'s signature', 'required' => false, 'current' => $membership?->signature_url, 'hint' => 'Optional. Photo of your signature on white paper, up to 2 MB.', 'box' => 'h-24 w-40'],
                             ['name' => 'voucher', 'label' => 'Payment voucher', 'required' => false, 'current' => $membership?->voucher_path ? route('dashboard.membership.voucher', $membership) : null, 'hint' => 'Photo of your bank / e-wallet payment slip, up to 5 MB.', 'box' => 'h-36 w-28'],
                         ];
                     @endphp
@@ -180,11 +179,6 @@
                                 <p class="mt-1 text-xs text-gray-400">{{ $up['hint'] }}</p>
                                 @if ($up['name'] === 'voucher')
                                 <p id="voucher-fee" class="mt-1 hidden text-xs font-semibold text-maroon"></p>
-                                @endif
-                                @if ($editing && $up['name'] === 'signature' && $up['current'])
-                                <label class="mt-2 flex items-center gap-2 text-xs text-gray-600">
-                                    <input type="checkbox" name="remove_signature" value="1" class="rounded border-gray-300 text-maroon focus:ring-maroon"> Remove current signature
-                                </label>
                                 @endif
                             </div>
                         </div>

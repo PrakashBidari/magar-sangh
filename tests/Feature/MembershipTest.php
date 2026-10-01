@@ -96,6 +96,8 @@ class MembershipTest extends TestCase
 
         $this->actingAs($user)->get(route('dashboard.my-membership.create'))->assertOk()->assertSee($type->name_en);
 
+        // The form no longer has an applicant's signature; one sent anyway is ignored.
+        $this->actingAs($user)->get(route('dashboard.my-membership.create'))->assertDontSee('signature');
         $this->actingAs($user)->post(route('dashboard.my-membership.store'), $this->payload($type, [
             'signature' => UploadedFile::fake()->image('sign.png'),
         ]))->assertRedirect(route('dashboard.my-membership.show'));
@@ -106,7 +108,7 @@ class MembershipTest extends TestCase
         $this->assertNull($membership->membership_number);
         $this->assertTrue($membership->applied_at->isToday());
         $this->assertStringStartsWith('/storage/memberships/photos/', $membership->photo_url);
-        $this->assertStringStartsWith('/storage/memberships/signatures/', $membership->signature_url);
+        $this->assertNull($membership->signature_url);
 
         $this->actingAs($user)->get(route('dashboard.my-membership.show'))->assertOk()->assertSee('under review');
 
@@ -116,13 +118,13 @@ class MembershipTest extends TestCase
         $this->assertDatabaseCount('memberships', 1);
     }
 
-    public function test_signature_is_optional_but_photo_and_declaration_are_required(): void
+    public function test_photo_and_declaration_are_required(): void
     {
         $type = MembershipType::factory()->create();
 
         $this->actingAs($this->member())
             ->post(route('dashboard.my-membership.store'), $this->payload($type, ['photo' => null, 'declaration' => null]))
-            ->assertSessionHasErrors(['photo', 'declaration'])->assertSessionDoesntHaveErrors('signature');
+            ->assertSessionHasErrors(['photo', 'declaration']);
 
         $this->assertDatabaseCount('memberships', 0);
     }
@@ -318,7 +320,9 @@ class MembershipTest extends TestCase
         $this->actingAs($owner)->get(route('dashboard.membership.card', $membership))
             ->assertOk()->assertSee('Card Holder')->assertSee($membership->fresh()->membership_number)->assertSee($membership->type->name_en)
             ->assertSee('Authorized signature')
-            ->assertSee($membership->municipality.'-'.$membership->ward_no.', '.$membership->district.', '.$membership->province)
+            // "Rolpa Municipality" is printed as "Rolpa" to save room on the card.
+            ->assertSee('Rolpa-'.$membership->ward_no.', '.$membership->district.', '.$membership->province)
+            ->assertDontSee('Rolpa Municipality-')
             ->assertDontSee($membership->current_address);
         $this->actingAs($admin)->get(route('dashboard.membership.card', $membership))->assertOk();
         $this->actingAs($this->member())->get(route('dashboard.membership.card', $membership))->assertForbidden();

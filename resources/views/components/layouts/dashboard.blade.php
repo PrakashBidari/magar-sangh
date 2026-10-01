@@ -42,6 +42,7 @@
         ['label' => 'Pending Sifaris', 'icon' => '⏳', 'href' => route('dashboard.sifaris.pending'), 'active' => request()->routeIs('dashboard.sifaris.pending') || $viewingSifaris === 'pending', 'badge' => $pendingSifaris ?: null, 'can' => 'sifaris.view'],
         ['label' => 'Approved Sifaris', 'icon' => '✅', 'href' => route('dashboard.sifaris.approved'), 'active' => request()->routeIs('dashboard.sifaris.approved') || $viewingSifaris === 'approved', 'badge' => null, 'can' => 'sifaris.view'],
         ['label' => 'Disapproved', 'icon' => '⛔', 'href' => route('dashboard.sifaris.rejected'), 'active' => request()->routeIs('dashboard.sifaris.rejected') || $viewingSifaris === 'rejected', 'badge' => null, 'can' => 'sifaris.view'],
+        ['label' => 'Sifaris Settings', 'icon' => '⚙️', 'href' => route('dashboard.sifaris.settings'), 'active' => request()->routeIs('dashboard.sifaris.settings'), 'badge' => null, 'can' => 'sifaris-settings.manage'],
     ]);
 
     // Lakhan Thapa Pratisthan: the donation list plus the page content settings.

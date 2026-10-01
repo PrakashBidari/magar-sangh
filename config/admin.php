@@ -72,6 +72,7 @@ return [
         'membership-applications' => ['group' => 'membership', 'label' => 'Membership Applications', 'icon' => '📝', 'actions' => ['view', 'edit', 'approve', 'delete']],
         'membership-settings' => ['group' => 'membership', 'label' => 'Membership Settings', 'icon' => '⚙️', 'actions' => ['manage']],
         'sifaris' => ['group' => 'sifaris', 'label' => 'Sifaris Requests', 'icon' => '📜', 'actions' => ['view', 'edit', 'approve', 'delete']],
+        'sifaris-settings' => ['group' => 'sifaris', 'label' => 'Sifaris Settings', 'icon' => '⚙️', 'actions' => ['manage']],
         'donation-settings' => ['group' => 'donation', 'label' => 'Donation Page Settings', 'icon' => '⚙️', 'actions' => ['manage']],
         'accounting' => ['group' => 'accounting', 'label' => 'Income & Expense Book', 'icon' => '📒', 'actions' => ['view', 'create', 'edit', 'delete']],
         'roles' => ['group' => 'access', 'label' => 'Roles & Permissions', 'icon' => '🛡️', 'actions' => ['view', 'create', 'edit', 'delete']],

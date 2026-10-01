@@ -2,8 +2,9 @@
     $backUrl = auth()->user()->can('membership-applications.view') && $membership->user_id !== auth()->id()
         ? route('dashboard.membership.show', $membership)
         : route('dashboard.my-membership.show');
-    // Municipality / Rural municipality-Ward, District, Province
-    $address = $membership->municipality.'-'.$membership->ward_no.', '.$membership->district.', '.$membership->province;
+    // Place-Ward, District, Province. The local level's type is dropped to save room: "Bardaghat Municipality" -> "Bardaghat".
+    $place = preg_replace('/\s+(Rural Municipality|Municipality|Sub-Metropolitan City|Metropolitan City)$/i', '', $membership->municipality);
+    $address = $place.'-'.$membership->ward_no.', '.$membership->district.', '.$membership->province;
     $validTill = $membership->expires_at?->format('d M Y') ?? 'Lifetime';
     $file = Str::lower($membership->membership_number);
 @endphp
@@ -13,11 +14,14 @@
         .id-card { position: relative; display: flex; flex-direction: column; width: 324px; height: 514px; overflow: hidden; border-radius: 16px; background: #fff; color: #1f2937; font-family: 'Noto Sans', 'Noto Sans Devanagari', sans-serif; }
         .id-card * { box-sizing: border-box; }
         .id-shadow { border-radius: 16px; box-shadow: 0 18px 40px -12px rgba(0, 119, 187, .45), 0 4px 10px rgba(0, 0, 0, .12); }
-        .id-head { position: relative; flex-shrink: 0; height: 100px; padding: 10px 16px 0; background: #0077bb; color: #fff; }
+        .id-head { position: relative; flex-shrink: 0; height: 100px; padding: 9px 16px 0; background: #0077bb; color: #fff; }
         .id-head::after { content: ''; position: absolute; right: -40px; top: -40px; width: 150px; height: 150px; border-radius: 50%; background: rgba(212, 175, 55, .16); }
         .id-head::before { content: ''; position: absolute; left: -30px; bottom: -60px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255, 255, 255, .07); }
         .id-gold { flex-shrink: 0; height: 5px; background: linear-gradient(90deg, #D4AF37, #f2dc8a, #D4AF37); }
-        .id-org { min-width: 0; font-family: 'Yatra One', 'Noto Sans Devanagari', serif; font-size: 24px; font-weight: 400; line-height: 1.15; letter-spacing: .01em; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .35); white-space: nowrap; }
+        .id-org { min-width: 0; font-family: 'Yatra One', 'Noto Sans Devanagari', serif; font-size: 22px; font-weight: 400; line-height: 1.15; letter-spacing: .01em; color: #fff; text-shadow: 0 2px 6px rgba(0, 0, 0, .35); white-space: nowrap; }
+        /* Slogan (left) and registration number (right) on either side of the photo, each on one line */
+        .id-side { position: absolute; bottom: 8px; z-index: 10; width: 117px; font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 700; line-height: 12px; text-align: center; white-space: nowrap; color: #fff; }
+        .id-akkha { display: block; height: 11px; width: auto; margin-top: 2px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .3)); }
         .id-logo { width: 44px; height: 52px; flex-shrink: 0; padding: 3px; border-radius: 8px; background: #fff center / contain no-repeat; background-origin: content-box; border: 2px solid #D4AF37; }
         .id-photo { flex-shrink: 0; width: 96px; height: 96px; margin: -32px auto 0; position: relative; z-index: 2; border-radius: 50%; border: 4px solid #fff; outline: 2px solid #D4AF37; background: #e5e7eb center / cover no-repeat; box-shadow: 0 6px 14px rgba(0, 0, 0, .25); }
         .id-label { font-size: 8.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; }
@@ -62,9 +66,13 @@
                                 @if ($siteSettings->logo_url)<div class="id-logo" style="background-image:url('{{ $siteSettings->logo_url }}')"></div>@endif
                                 <div class="min-w-0 text-left">
                                     <div class="id-org np">{{ $siteSettings->site_name_np }}</div>
-                                    <div style="font-size:15px;line-height:1.2;font-weight:600;color:#fff">Central Committee</div>
+                                    {{-- The association's name in Magar Akkha script (an image: the script has no web font) --}}
+                                    <img src="{{ asset('images/magar-akkha-title.png') }}" alt="" class="id-akkha">
+                                    <div style="margin-top:3px;font-size:9.5px;line-height:1.2;font-weight:600;letter-spacing:.04em;color:#fff">Central Committee</div>
                                 </div>
                             </div>
+                            <div class="id-side" style="left:2px;font-size:10px">“सम्पूर्ण मगरहरू एक होऔं”</div>
+                            <div class="id-side" style="right:2px;font-size:7.7px;font-weight:600">का.जि.प्र.का.दर्ता नं. २५२/२०४९/२०५०</div>
                         </div>
                         <div class="id-gold"></div>
 
@@ -138,7 +146,7 @@
             // Returns a data URL rendered at 4x so the file is print quality (about 1300 x 2050 px).
             // PNG keeps the rounded corners transparent; JPEG (for the PDF) is far smaller than a PNG.
             const capture = async (format = 'png') => {
-                await document.fonts.load('24px "Yatra One"', @json($siteSettings->site_name_np)).catch(() => {});
+                await document.fonts.load('22px "Yatra One"', @json($siteSettings->site_name_np)).catch(() => {});
                 await document.fonts.ready;
                 const node = document.getElementById('id-card');
                 const options = { cacheBust: true, imagePlaceholder: BLANK, fontEmbedCSS: await window.htmlToImage.getFontEmbedCSS(node) };

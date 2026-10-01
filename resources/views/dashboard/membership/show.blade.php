@@ -110,15 +110,6 @@
                     @endif
                     <p class="mt-3 text-xs text-gray-400">Fee: {{ $membership->type->fee_label }}</p>
                 </div>
-
-                <div class="card">
-                    <h3 class="mb-3 text-sm font-bold uppercase tracking-wider text-gray-500">Signature</h3>
-                    @if ($membership->signature_url)
-                    <img src="{{ $membership->signature_url }}" alt="Signature" class="max-h-28 rounded-md border border-gray-200 bg-white object-contain p-2">
-                    @else
-                    <p class="text-sm text-gray-400">Not provided.</p>
-                    @endif
-                </div>
             </div>
         </div>
     </div>

@@ -41,7 +41,10 @@
             </div>
 
             <div class="lg:col-span-2">
-                <img src="{{ asset('images/sifaris-template.jpg') }}" alt="Sample sifaris letter" loading="lazy" class="mx-auto w-full max-w-sm rounded-md shadow-xl ring-1 ring-gray-200">
+                {{-- Sample: the blank letter with the current signatory and contact details --}}
+                <div class="mx-auto max-w-sm">
+                    @include('dashboard.sifaris._letter', ['sifaris' => null])
+                </div>
             </div>
         </div>
     </section>

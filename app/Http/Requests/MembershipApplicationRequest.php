@@ -58,7 +58,6 @@ class MembershipApplicationRequest extends FormRequest
             'email' => ['required', 'email', 'max:255'],
             'occupation' => ['required', 'string', 'max:255'],
             'photo' => [$existing ? 'nullable' : 'required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
-            'signature' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'voucher' => [$voucherNeeded ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'declaration' => [$existing ? 'nullable' : 'accepted'],
             'expires_at' => ['nullable', 'date'],
@@ -67,7 +66,7 @@ class MembershipApplicationRequest extends FormRequest
 
     /**
      * The validated form as model attributes. Uploaded files are stored (and the ones they
-     * replace deleted): photo and signature on the public disk, the voucher on the private disk.
+     * replace deleted): the photo on the public disk, the voucher on the private disk.
      */
     public function applicationData(?Membership $existing = null): array
     {
@@ -76,18 +75,11 @@ class MembershipApplicationRequest extends FormRequest
             'province', 'district', 'municipality', 'ward_no', 'mobile', 'email', 'occupation',
         ]);
 
-        foreach (['photo' => 'photo_url', 'signature' => 'signature_url'] as $input => $column) {
-            if ($this->hasFile($input)) {
-                if ($existing?->{$column} && str_starts_with($existing->{$column}, '/storage/')) {
-                    Storage::disk('public')->delete(Str::after($existing->{$column}, '/storage/'));
-                }
-                $data[$column] = '/storage/'.$this->file($input)->store('memberships/'.$input.'s', 'public');
-            } elseif ($existing && $input === 'signature' && $this->boolean('remove_signature')) {
-                if ($existing->signature_url) {
-                    Storage::disk('public')->delete(Str::after($existing->signature_url, '/storage/'));
-                }
-                $data[$column] = null;
+        if ($this->hasFile('photo')) {
+            if ($existing?->photo_url && str_starts_with($existing->photo_url, '/storage/')) {
+                Storage::disk('public')->delete(Str::after($existing->photo_url, '/storage/'));
             }
+            $data['photo_url'] = '/storage/'.$this->file('photo')->store('memberships/photos', 'public');
         }
 
         if ($this->hasFile('voucher')) {

@@ -90,6 +90,9 @@
                     <div>
                         <label for="letter_date" class="text-sm font-semibold text-gray-700">मिति (date)</label>
                         <input type="text" id="letter_date" name="letter_date" value="{{ old('letter_date', $sifaris->letter_date) }}" maxlength="50" placeholder="जस्तै: २०८३/०६/१४" class="{{ $input }}">
+                        @unless ($sifaris->isApproved())
+                        <p class="mt-1 text-xs text-gray-500">Leave blank to use the approval date automatically.</p>
+                        @endunless
                     </div>
                     <button type="submit" class="w-full rounded-md px-4 py-2.5 text-sm font-semibold text-white {{ $letterForm['class'] }}">{{ $letterForm['button'] }}</button>
                 </form>

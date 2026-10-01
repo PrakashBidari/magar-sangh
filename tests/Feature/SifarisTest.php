@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\SifarisRequest;
+use App\Models\SifarisSetting;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -142,6 +143,55 @@ class SifarisTest extends TestCase
         $this->actingAs($admin)->put(route('dashboard.sifaris.letter.update', $sifaris), ['letter_number' => '२०८३/०९०'])->assertRedirect();
         $this->assertSame('२०८३/०९०', $sifaris->fresh()->letter_number);
         $this->assertTrue($sifaris->fresh()->isApproved());
+    }
+
+    public function test_approving_without_a_date_uses_the_approval_date(): void
+    {
+        $sifaris = $this->applyAs($this->member());
+
+        $this->travelTo('2026-10-01 12:00:00');
+        $this->actingAs($this->admin())->post(route('dashboard.sifaris.approve', $sifaris), ['letter_number' => '१२३'])->assertRedirect();
+
+        $this->assertSame('२०८३/०६/१५', $sifaris->fresh()->letter_date);
+    }
+
+    public function test_sifaris_settings_are_edit_only_and_printed_on_the_letter(): void
+    {
+        $admin = $this->admin();
+        $sifaris = $this->applyAs($this->member());
+
+        // Starts with the seeded defaults.
+        $this->actingAs($this->member())->get(route('dashboard.sifaris.settings'))->assertForbidden();
+        $this->actingAs($admin)->get(route('dashboard.sifaris.settings'))->assertOk()->assertSee('होमराज खमारी मगर');
+        $this->actingAs($admin)->get(route('dashboard.sifaris.show', $sifaris))
+            ->assertSee('/images/sifaris-signature.png', false)->assertSee('nepalmagarsangh@hotmail.com');
+
+        $this->actingAs($admin)->put(route('dashboard.sifaris.settings.update'), ['signatory_name' => ''])->assertSessionHasErrors('signatory_name');
+
+        $this->actingAs($admin)->put(route('dashboard.sifaris.settings.update'), [
+            'signature' => UploadedFile::fake()->image('sign.png', 400, 200),
+            'signatory_name' => 'नयाँ महासचिव मगर',
+            'signatory_title' => 'अध्यक्ष',
+            'phone' => '01-1111111, 9800000000',
+            'email' => 'office@example.com',
+            'website' => 'example.org.np',
+        ])->assertRedirect(route('dashboard.sifaris.settings'));
+
+        $settings = SifarisSetting::sole(); // still the one row
+        $this->assertStringStartsWith('/storage/signatures/', $settings->signature_url);
+        Storage::disk('public')->assertExists(Str::after($settings->signature_url, '/storage/'));
+
+        $this->actingAs($admin)->get(route('dashboard.sifaris.show', $sifaris))
+            ->assertSee($settings->signature_url, false)->assertSee('नयाँ महासचिव मगर')->assertSee('(अध्यक्ष)')
+            ->assertSee('9800000000')->assertSee('office@example.com')->assertSee('example.org.np')
+            ->assertDontSee('होमराज खमारी मगर');
+
+        // The public sample uses the same details.
+        $this->get(route('sifaris'))->assertOk()->assertSee('नयाँ महासचिव मगर');
+
+        // There is no way to add or delete the settings row.
+        $this->actingAs($admin)->post('/dashboard/sifaris/settings')->assertStatus(405);
+        $this->actingAs($admin)->delete('/dashboard/sifaris/settings')->assertStatus(405);
     }
 
     public function test_admin_can_disapprove_edit_and_delete(): void
